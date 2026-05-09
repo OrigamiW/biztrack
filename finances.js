@@ -113,50 +113,87 @@ function newTransaction(event) {
     document.getElementById("transaction-form").reset();
 }
 
+function createTextCell(value, className = "") {
+  const td = document.createElement("td");
+  td.textContent = value == null ? "" : String(value);
+
+  if (className) {
+    td.className = className;
+  }
+
+  return td;
+}
+
+function createIconButton(title, iconClass, onClick) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "icon-button";
+  button.title = title;
+  button.setAttribute("aria-label", title);
+
+  const icon = document.createElement("i");
+  icon.className = iconClass;
+  icon.setAttribute("aria-hidden", "true");
+
+  button.appendChild(icon);
+  button.addEventListener("click", onClick);
+
+  return button;
+}
 
 function renderTransactions(transactions) {
-    const transactionTableBody = document.getElementById("tableBody");
-    transactionTableBody.innerHTML = "";
+  const transactionTableBody = document.getElementById("tableBody");
+  transactionTableBody.replaceChildren();
 
-    const transactionToRender = transactions;
+  transactions.forEach(transaction => {
+    const transactionRow = document.createElement("tr");
+    transactionRow.className = "transaction-row";
 
-    transactionToRender.forEach(transaction => {
-        const transactionRow = document.createElement("tr");
-        transactionRow.className = "transaction-row";
+    transactionRow.dataset.trID = transaction.trID;
+    transactionRow.dataset.trDate = transaction.trDate;
+    transactionRow.dataset.trCategory = transaction.trCategory;
+    transactionRow.dataset.trAmount = transaction.trAmount;
+    transactionRow.dataset.trNotes = transaction.trNotes;
 
-        transactionRow.dataset.trID = transaction.trID;
-        transactionRow.dataset.trDate = transaction.trDate;
-        transactionRow.dataset.trCategory = transaction.trCategory;
-        transactionRow.dataset.trAmount = transaction.trAmount;
-        transactionRow.dataset.trNotes = transaction.trNotes;
+    const formattedAmount = typeof transaction.trAmount === "number" ? `$${transaction.trAmount.toFixed(2)}` : "";
 
-        const formattedAmount = typeof transaction.trAmount === 'number' ? `$${transaction.trAmount.toFixed(2)}` : '';
+    transactionRow.appendChild(createTextCell(transaction.trID));
+    transactionRow.appendChild(createTextCell(transaction.trDate));
+    transactionRow.appendChild(createTextCell(transaction.trCategory));
+    transactionRow.appendChild(createTextCell(formattedAmount, "tr-amount"));
+    transactionRow.appendChild(createTextCell(transaction.trNotes));
 
-        transactionRow.innerHTML = `
-            <td>${transaction.trID}</td>
-            <td>${transaction.trDate}</td>
-            <td>${transaction.trCategory}</td>
-            <td class="tr-amount">${formattedAmount}</td>
-            <td>${transaction.trNotes}</td>
-            <td class="action">
-                <i title="Edit" onclick="editRow('${transaction.trID}')" class="edit-icon fa-solid fa-pen-to-square"></i>
-                <i onclick="deleteTransaction('${transaction.trID}')" class="delete-icon fas fa-trash-alt"></i>
-            </td> 
-        `;
-        transactionTableBody.appendChild(transactionRow);
+    const actionCell = document.createElement("td");
+    actionCell.className = "action";
+
+    actionCell.appendChild(
+      createIconButton(
+        `Edit transaction ${transaction.trID}`,
+        "edit-icon fa-solid fa-pen-to-square",
+        () => editRow(transaction.trID)
+      )
+    );
+
+    actionCell.appendChild(
+      createIconButton(
+        `Delete transaction ${transaction.trID}`,
+        "delete-icon fas fa-trash-alt",
+        () => deleteTransaction(transaction.trID)
+      )
+    );
+
+    transactionRow.appendChild(actionCell);
+    transactionTableBody.appendChild(transactionRow);
   });
+
   displayExpenses();
 }
 
 function displayExpenses() {
-    const resultElement = document.getElementById("total-expenses");
+  const resultElement = document.getElementById("total-expenses");
+  const totalExpenses = transactions.reduce((total, transaction) => total + transaction.trAmount, 0);
 
-    const totalExpenses = transactions
-        .reduce((total, transaction) => total + transaction.trAmount,0);
-
-    resultElement.innerHTML = `
-        <span>Total Expenses: $${totalExpenses.toFixed(2)}</span>
-    `;
+  resultElement.textContent = `Total Expenses: $${totalExpenses.toFixed(2)}`;
 }
 
 function editRow(trID) {

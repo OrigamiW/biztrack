@@ -137,69 +137,115 @@ function newOrder(event) {
   document.getElementById("order-form").reset();
 }
 
+function createTextCell(value, className = "") {
+  const td = document.createElement("td");
+  td.textContent = value == null ? "" : String(value);
+
+  if (className) {
+    td.className = className;
+  }
+
+  return td;
+}
+
+function createIconButton(title, iconClass, onClick) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "icon-button";
+  button.title = title;
+  button.setAttribute("aria-label", title);
+
+  const icon = document.createElement("i");
+  icon.className = iconClass;
+  icon.setAttribute("aria-hidden", "true");
+
+  button.appendChild(icon);
+  button.addEventListener("click", onClick);
+
+  return button;
+}
 
 function renderOrders(orders) {
-    const orderTableBody = document.getElementById("tableBody");
-    orderTableBody.innerHTML = "";
+  const orderTableBody = document.getElementById("tableBody");
+  orderTableBody.replaceChildren();
 
-    const orderToRender = orders;
-    const statusMap = {
-        "Pending": "pending",
-        "Processing": "processing",
-        "Shipped": "shipped",
-        "Delivered": "delivered"
-    }
+  const statusMap = {
+    Pending: "pending",
+    Processing: "processing",
+    Shipped: "shipped",
+    Delivered: "delivered"
+  };
 
-    orderToRender.forEach(order => {
-      const orderRow = document.createElement("tr");
-      orderRow.className = "order-row";
+  orders.forEach(order => {
+    const orderRow = document.createElement("tr");
+    orderRow.className = "order-row";
 
-      orderRow.dataset.orderID = order.orderID;
-      orderRow.dataset.orderDate = order.orderDate;
-      orderRow.dataset.itemName = order.itemName;
-      orderRow.dataset.itemPrice = order.itemPrice;
-      orderRow.dataset.qtyBought = order.qtyBought;
-      orderRow.dataset.shipping = order.shipping;
-      orderRow.dataset.taxes = order.taxes;
-      orderRow.dataset.orderTotal = order.orderTotal;
-      orderRow.dataset.orderStatus = order.orderStatus;
+    orderRow.dataset.orderID = order.orderID;
+    orderRow.dataset.orderDate = order.orderDate;
+    orderRow.dataset.itemName = order.itemName;
+    orderRow.dataset.itemPrice = order.itemPrice;
+    orderRow.dataset.qtyBought = order.qtyBought;
+    orderRow.dataset.shipping = order.shipping;
+    orderRow.dataset.taxes = order.taxes;
+    orderRow.dataset.orderTotal = order.orderTotal;
+    orderRow.dataset.orderStatus = order.orderStatus;
 
-      const formattedPrice = typeof order.itemPrice === 'number' ? `$${order.itemPrice.toFixed(2)}` : '';
-      const formattedShipping = typeof order.shipping === 'number' ? `$${order.shipping.toFixed(2)}` : '';
-      const formattedTaxes = typeof order.taxes === 'number' ? `$${order.taxes.toFixed(2)}` : '';
-      const formattedTotal = typeof order.orderTotal === 'number' ? `$${order.orderTotal.toFixed(2)}` : '';
+    const formattedPrice = typeof order.itemPrice === "number" ? `$${order.itemPrice.toFixed(2)}` : "";
+    const formattedShipping = typeof order.shipping === "number" ? `$${order.shipping.toFixed(2)}` : "";
+    const formattedTaxes = typeof order.taxes === "number" ? `$${order.taxes.toFixed(2)}` : "";
+    const formattedTotal = typeof order.orderTotal === "number" ? `$${order.orderTotal.toFixed(2)}` : "";
 
-      orderRow.innerHTML = `
-        <td>${order.orderID}</td>
-        <td>${order.orderDate}</td>
-        <td>${order.itemName}</td>
-        <td>${formattedPrice}</td>
-        <td>${order.qtyBought}</td>
-        <td>${formattedShipping}</td>
-        <td>${formattedTaxes}</td>
-        <td class="order-total">${formattedTotal}</td>
-        <td>
-            <div class="status ${statusMap[order.orderStatus]}"><span>${order.orderStatus}</span></div>
-        </td>
-        <td class="action">
-            <i title="Edit" onclick="editRow('${order.orderID}')" class="edit-icon fa-solid fa-pen-to-square"></i>
-            <i onclick="deleteOrder('${order.orderID}')" class="delete-icon fas fa-trash-alt"></i>
-          </td> 
-      `;
-      orderTableBody.appendChild(orderRow);
+    orderRow.appendChild(createTextCell(order.orderID));
+    orderRow.appendChild(createTextCell(order.orderDate));
+    orderRow.appendChild(createTextCell(order.itemName));
+    orderRow.appendChild(createTextCell(formattedPrice));
+    orderRow.appendChild(createTextCell(order.qtyBought));
+    orderRow.appendChild(createTextCell(formattedShipping));
+    orderRow.appendChild(createTextCell(formattedTaxes));
+    orderRow.appendChild(createTextCell(formattedTotal, "order-total"));
+
+    const statusCell = document.createElement("td");
+    const statusDiv = document.createElement("div");
+    statusDiv.className = `status ${statusMap[order.orderStatus] || ""}`;
+
+    const statusText = document.createElement("span");
+    statusText.textContent = order.orderStatus;
+
+    statusDiv.appendChild(statusText);
+    statusCell.appendChild(statusDiv);
+    orderRow.appendChild(statusCell);
+
+    const actionCell = document.createElement("td");
+    actionCell.className = "action";
+
+    actionCell.appendChild(
+      createIconButton(
+        `Edit order ${order.orderID}`,
+        "edit-icon fa-solid fa-pen-to-square",
+        () => editRow(order.orderID)
+      )
+    );
+
+    actionCell.appendChild(
+      createIconButton(
+        `Delete order ${order.orderID}`,
+        "delete-icon fas fa-trash-alt",
+        () => deleteOrder(order.orderID)
+      )
+    );
+
+    orderRow.appendChild(actionCell);
+    orderTableBody.appendChild(orderRow);
   });
+
   displayRevenue();
 }
 
 function displayRevenue() {
-    const resultElement = document.getElementById("total-revenue");
+  const resultElement = document.getElementById("total-revenue");
+  const totalRevenue = orders.reduce((total, order) => total + order.orderTotal, 0);
 
-    const totalRevenue = orders
-        .reduce((total, order) => total + order.orderTotal, 0);
-
-    resultElement.innerHTML = `
-        <span>Total Revenue: $${totalRevenue.toFixed(2)}</span>
-    `;
+  resultElement.textContent = `Total Revenue: $${totalRevenue.toFixed(2)}`;
 }
 
 function editRow(orderID) {

@@ -116,10 +116,37 @@ function newProduct(event) {
   document.getElementById("product-form").reset();
 }
 
+function createTextCell(value, className = "") {
+  const td = document.createElement("td");
+  td.textContent = value == null ? "" : String(value);
+
+  if (className) {
+    td.className = className;
+  }
+
+  return td;
+}
+
+function createIconButton(title, iconClass, onClick) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "icon-button";
+  button.title = title;
+  button.setAttribute("aria-label", title);
+
+  const icon = document.createElement("i");
+  icon.className = iconClass;
+  icon.setAttribute("aria-hidden", "true");
+
+  button.appendChild(icon);
+  button.addEventListener("click", onClick);
+
+  return button;
+}
 
 function renderProducts(products) {
   const prodTableBody = document.getElementById("tableBody");
-  prodTableBody.innerHTML = "";
+  prodTableBody.replaceChildren();
 
   const prodToRender = products;
 
@@ -134,18 +161,33 @@ function renderProducts(products) {
       prodRow.dataset.prodPrice = product.prodPrice;
       prodRow.dataset.prodSold = product.prodSold;
 
-      prodRow.innerHTML = `
-          <td>${product.prodID}</td>
-          <td>${product.prodName}</td>
-          <td>${product.prodDesc}</td>
-          <td>${product.prodCat}</td>
-          <td>$${product.prodPrice.toFixed(2)}</td>
-          <td>${product.prodSold}</td>
-          <td class="action">
-            <i title="Edit" onclick="editRow('${product.prodID}')" class="edit-icon fa-solid fa-pen-to-square"></i>
-            <i onclick="deleteProduct('${product.prodID}')" class="delete-icon fas fa-trash-alt"></i>
-          </td>
-      `;
+      prodRow.appendChild(createTextCell(product.prodID));
+      prodRow.appendChild(createTextCell(product.prodName));
+      prodRow.appendChild(createTextCell(product.prodDesc));
+      prodRow.appendChild(createTextCell(product.prodCat));
+      prodRow.appendChild(createTextCell(`$${Number(product.prodPrice).toFixed(2)}`));
+      prodRow.appendChild(createTextCell(product.prodSold));
+
+      const actionCell = document.createElement("td");
+      actionCell.className = "action";
+
+      actionCell.appendChild(
+        createIconButton(
+          `Edit product ${product.prodID}`,
+          "edit-icon fa-solid fa-pen-to-square",
+          () => editRow(product.prodID)
+        )
+      );
+
+      actionCell.appendChild(
+        createIconButton(
+          `Delete product ${product.prodID}`,
+          "delete-icon fas fa-trash-alt",
+          () => deleteProduct(product.prodID)
+        )
+      );
+
+      prodRow.appendChild(actionCell);
       prodTableBody.appendChild(prodRow);
   });
 }
