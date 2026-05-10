@@ -19,8 +19,16 @@ function closeForm() {
 }
 
 let orders = [];
+let products = [];
 
 window.onload = function () {
+    // Load products
+    const storedProducts = localStorage.getItem("bizTrackProducts");
+    if (storedProducts) {
+        products = JSON.parse(storedProducts);
+    }
+
+    // Load orders
     const storedOrders = localStorage.getItem("bizTrackOrders");
     if (storedOrders) {
         orders = JSON.parse(storedOrders);
@@ -85,8 +93,35 @@ window.onload = function () {
 
         localStorage.setItem("bizTrackOrders", JSON.stringify(orders));
     }
-
+    populateProductSelect();
     renderOrders(orders);
+}
+
+function populateProductSelect() {
+    const productSelect = document.getElementById("product-select");
+    productSelect.innerHTML = '<option value="" disabled selected hidden>Choose a product</option>';
+
+    products.forEach(product => {
+        const option = document.createElement("option");
+        option.value = product.prodID;
+        option.textContent = `${product.prodName} - $${product.prodPrice.toFixed(2)}`;
+        productSelect.appendChild(option);
+    });
+
+    // Add event listener to update price when product is selected
+    productSelect.addEventListener("change", function() {
+        const selectedProductId = this.value;
+        if (selectedProductId) {
+            const selectedProduct = products.find(p => p.prodID === selectedProductId);
+            if (selectedProduct) {
+                document.getElementById("item-name").value = selectedProduct.prodName;
+                document.getElementById("item-price").value = selectedProduct.prodPrice;
+            }
+        } else {
+            document.getElementById("item-name").value = "";
+            document.getElementById("item-price").value = "";
+        }
+    });
 }
 
 function addOrUpdate(event) {
@@ -111,6 +146,7 @@ function newOrder(event) {
   const taxes = parseFloat(document.getElementById("taxes").value);
   const orderTotal = ((itemPrice * qtyBought) + shipping + taxes);
   const orderStatus = document.getElementById("order-status").value;
+  const productSelect = document.getElementById("product-select").value;
 
   if (isDuplicateID(orderID, null)) {
     alert("Order ID already exists. Please use a unique ID.");
@@ -127,15 +163,29 @@ function newOrder(event) {
     taxes,
     orderTotal,
     orderStatus,
+    productID: productSelect
+
   };
 
   orders.push(order);
+  // Update product sales quantity
+  updateProductSales(productSelect, qtyBought);
 
   renderOrders(orders);
   localStorage.setItem("bizTrackOrders", JSON.stringify(orders));
 
   document.getElementById("order-form").reset();
 }
+
+function updateProductSales(productID, quantity) {
+  const productIndex = products.findIndex(p => p.prodID === productID);
+  if (productIndex !== -1) {
+    products[productIndex].prodSold += quantity;
+    localStorage.setItem("bizTrackProducts", JSON.stringify(products));
+  }
+}
+
+
 
 function createTextCell(value, className = "") {
   const td = document.createElement("td");
@@ -270,6 +320,12 @@ function deleteOrder(orderID) {
   const indexToDelete = orders.findIndex(order => order.orderID === orderID);
 
   if (indexToDelete !== -1) {
+      const orderToDelete = orders[indexToDelete];
+      // Update product sales quantity by subtracting the deleted order's quantity
+      if (orderToDelete.productID) {
+          updateProductSales(orderToDelete.productID, -orderToDelete.qtyBought);
+      }
+
       orders.splice(indexToDelete, 1);
 
       localStorage.setItem("bizTrackOrders", JSON.stringify(orders));
@@ -282,10 +338,14 @@ function updateOrder(orderID) {
     const indexToUpdate = orders.findIndex(order => order.orderID === orderID);
 
     if (indexToUpdate !== -1) {
+        const oldOrder = orders[indexToUpdate];
+
         const itemPrice = parseFloat(document.getElementById("item-price").value);
         const qtyBought = parseInt(document.getElementById("qty-bought").value);
         const shipping = parseFloat(document.getElementById("shipping").value);
         const taxes = parseFloat(document.getElementById("taxes").value);
+        const productSelect = document.getElementById("product-select").value;
+
         const updatedOrder = {
             orderID: document.getElementById("order-id").value,
             orderDate: document.getElementById("order-date").value,
@@ -296,12 +356,21 @@ function updateOrder(orderID) {
             taxes: taxes,
             orderTotal: ((itemPrice * qtyBought) + shipping + taxes),
             orderStatus: document.getElementById("order-status").value,
+            productID: productSelect
+
         };
 
         if (isDuplicateID(updatedOrder.orderID, orderID)) {
             alert("Order ID already exists. Please use a unique ID.");
             return;
         }
+        // Update product sales quantity
+        if (oldOrder.productID) {
+            // Subtract old quantity
+            updateProductSales(oldOrder.productID, -oldOrder.qtyBought);
+        }
+        // Add new quantity
+        updateProductSales(productSelect, qtyBought);
 
         orders[indexToUpdate] = updatedOrder;
 

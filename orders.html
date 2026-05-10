@@ -99,41 +99,17 @@
                             <label for="order-date"><b>Order Date: </b></label>
                             <input type="date" id="order-date" required>
 
-                            <label for="item-name"><b>Item Name: </b></label>
-                            <select name="item-name" id="item-name" required>
-                                <option value="" disabled selected hidden>Choose an item</option>
-                                <optgroup label="Hats">
-                                    <option value="Baseball caps">Baseball caps</option>
-                                    <option value="Snapbacks">Snapbacks</option>
-                                    <option value="Beanies">Beanies</option>
-                                    <option value="Bucket hats">Bucket hats</option>
-                                </optgroup>
-                                <optgroup label="Drinkware">
-                                    <option value="Mugs">Mugs</option>
-                                    <option value="Water bottles">Water bottles</option>
-                                    <option value="Tumblers">Tumblers</option>
-                                </optgroup>   
-                                <optgroup label="Clothing">
-                                    <option value="T-shirts">T-shirts</option>
-                                    <option value="Sweatshirts">Sweatshirts</option>
-                                    <option value="Hoodies">Hoodies</option>
-                                </optgroup>   
-                                <optgroup label="Accessories">
-                                    <option value="Pillow cases">Pillow cases</option>
-                                    <option value="Tote bags">Tote bags</option>
-                                    <option value="Stickers">Stickers</option>
-                                </optgroup>   
-                                <optgroup label="Home decor">
-                                    <option value="Posters">Posters</option>
-                                    <option value="Framed posters">Framed posters</option>
-                                    <option value="Canvas prints">Canvas prints</option>
-                                </optgroup>
+                            <label for="product-select"><b>Product: </b></label>
+                            <select name="product-select" id="product-select" required>
+                                <option value="" disabled selected hidden>Choose a product</option>
+                                <!-- Products will be populated by JavaScript -->
                             </select>
+                            <input type="hidden" id="item-name" value="">
                         </div>
 
                         <div class="order-second-col">
                             <label for="item-price"><b>Item Price:</b></label>
-                            <input type="number" id="item-price" placeholder="$0.00" min="0.00" max="10000.00" step="0.01" required>
+                            <input type="number" id="item-price" placeholder="$0.00" min="0.00" max="10000.00" step="0.01" required readonly>
 
                             <label for="qty-bought"><b>Quantity Bought:</b></label>
                             <input type="number" id="qty-bought" placeholder="1" required>
