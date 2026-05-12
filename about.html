@@ -13,13 +13,16 @@
     <title>About - Biztrack</title>
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <div id="sidebar" class="sidebar">
         <div class="logo">
             <a href="./index.html">
-                <i class="fas fa-b"></i>
+                <i class="fas fa-b" aria-hidden="true"></i>
                 <span>BizTrack</span>
             </a>
-            <i class="fa-solid fa-xmark" title="Close" onclick="closeSidebar()"></i>
+            <button type="button" class="sidebar-close" aria-label="Close sidebar" onclick="closeSidebar()">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
         </div>
         <ul class="menu">
             <li>
@@ -61,14 +64,16 @@
         </ul>
     </div>
 
-    <div class="main-content">
+    <div class="main-content" id="main-content" tabindex="-1">
         <div class="header-wrapper">
-            <div class="menu-icon" onclick="openSidebar()">
-                <i class="fa-solid fa-bars"></i>
-            </div>
+            <button type="button" class="menu-icon sidebar-toggle" aria-label="Open sidebar" aria-expanded="true" onclick="openSidebar()">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            </button>
+
             <div class="header-title">
                 <h2>My Coding Journey</h2>
             </div>
+
             <div class="user-info">
             </div>
         </div>
@@ -78,7 +83,7 @@
                 <article>
                     <h3 class="main-title">Hey, I'm Sumayyah!
                     </h3>
-                    <p>Welcome to my little corner of the internet, where I'm rolling up my sleeves and diving into the coding world. I’m not your typical tech guru – I’m just a small business owner navigating the hustle and bustle of entrepreneurship. Oh, and did I mention I’m also part of the <a href="https://www.getcoding.ca/coaching-program-nl" target="_blank">GetCoding NL</a> program? Yeah, it's been quite the journey, and I owe a huge shoutout to my coding coach, Sam.</p> 
+                    <p>Welcome to my little corner of the internet, where I'm rolling up my sleeves and diving into the coding world. I’m not your typical tech guru – I’m just a small business owner navigating the hustle and bustle of entrepreneurship. Oh, and did I mention I’m also part of the <a href="https://www.getcoding.ca/coaching-program-nl" target="_blank" rel="noopener noreferrer">GetCoding NL</a> program? Yeah, it's been quite the journey, and I owe a huge shoutout to my coding coach, Sam.</p> 
                 </article>
                 <article>
                     <p>Let me spill the tea on BizTrack, my brainchild. So, picture this: I'm running a small business, trying to keep tabs on products, orders, and the never-ending finances - It’s a lot. That's when the light bulb moment happened, and BizTrack was born. It's not just a project; it's my answer to the chaos that comes with managing a business.</p>
@@ -87,24 +92,24 @@
 
                     <p> I'm a student at GetCoding NL, a software development program that's turning me from someone who googles how websites work into someone who actually understands and builds them. And guess what? BizTrack is my first module project, allowing me to practically apply the skills and knowledge gained in the program. Learning by doing, they say, and that’s exactly what I'm doing.</p>
 
-                    <p> But none of this would be possible without the guidance of my amazing coach, <a href="https://github.com/samwise-nl" target="_blank">Sam Russell</a>. Sam has been the compass in my coding journey. Patient, encouraging, and always ready with a helpful tip – he has made navigating the coding seas a whole lot less daunting.</p>
+                    <p> But none of this would be possible without the guidance of my amazing coach, <a href="https://github.com/samwise-nl" target="_blank" rel="noopener noreferrer">Sam Russell</a>. Sam has been the compass in my coding journey. Patient, encouraging, and always ready with a helpful tip – he has made navigating the coding seas a whole lot less daunting.</p>
 
                     <p>So, why spill all this in an about me section? Well, I’m not just sharing my story; I’m inviting you to join me on my journey. Whether you're into the chaos of small business life, curious about coding escapades, or just want to see where the two collide – you're welcome here.</p>
 
                     <ul class="contact-icon">
                         <li>
-                            <a href="https://www.linkedin.com/in/sumayyahmusa/" target=”_blank”
-                                <i class="fa-brands fa-linkedin"></i>
+                            <a href="https://www.linkedin.com/in/sumayyahmusa/" target="_blank" rel="noopener noreferrer" aria-label="Open LinkedIn profile">
+                                <i class="fa-brands fa-linkedin" aria-hidden="true"></i>
                             </a> 
                         </li>
                         <li>
-                            <a href="https://github.com/sumusa/"target=”_blank”
-                                <i class="fa-brands fa-square-github"></i>
-                            </a> 
+                            <a href="https://github.com/sumusa/" target="_blank" rel="noopener noreferrer" aria-label="Open GitHub profile">
+                                <i class="fa-brands fa-square-github" aria-hidden="true"></i>
+                            </a>
                         </li>
                         <li>
-                            <a href="mailto:info@summeesarts.com" target=”_blank”
-                                <i class="fa-solid fa-envelope"></i>
+                            <a href="mailto:info@summeesarts.com" aria-label="Email the developer">
+                                <i class="fa-solid fa-envelope" aria-hidden="true"></i>
                             </a> 
                         </li>
                     </ul>
@@ -116,3 +121,4 @@
     </div>
     <script src="./help.js"></script>
 </body>
+</html>

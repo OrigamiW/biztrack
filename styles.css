@@ -9,12 +9,12 @@
     --light-orange: #FFF5EE;
     --white-color: #f2f4f7;
     --green-color: #249672;
+    --focus-color: #005fcc;
 }
 * {
     margin: 0;
     padding: 0;
     border: none;
-    outline: none;
     box-sizing: border-box;
     font-family: "Lato", sans-serif;
 }
@@ -114,6 +114,86 @@ body {
     font-size: 1.5rem;
     cursor: pointer;
 }
+/* Accessibility: visible keyboard focus and keyboard-operable icon controls */
+.skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 1000;
+    background: #ffffff;
+    color: var(--black-color);
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.skip-link:focus-visible {
+    top: 1rem;
+    outline: 3px solid var(--focus-color);
+    outline-offset: 3px;
+}
+
+.sidebar-close,
+.sidebar-toggle,
+.icon-button,
+.sort-button {
+    cursor: pointer;
+}
+
+.sidebar-close,
+.sidebar-toggle {
+    background: transparent;
+    color: inherit;
+    padding: 0.5rem;
+    border-radius: 6px;
+    line-height: 1;
+}
+
+.sidebar-close {
+    color: var(--light-orange);
+}
+
+.sidebar-close:hover,
+.sidebar-close:focus-visible {
+    color: var(--orange-color);
+}
+
+.sort-button {
+    width: 100%;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 700;
+    text-align: left;
+    padding: 0.25rem;
+    border-radius: 4px;
+}
+
+.sort-button::after {
+    content: " ↕";
+    font-size: 0.8rem;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid var(--focus-color);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 5px rgba(0, 95, 204, 0.25);
+}
+
+.menu a:focus-visible {
+    background: var(--orange-color);
+    border-radius: 8px;
+}
+
+.main-content:focus {
+    outline: none;
+}
+
 .logout {
     position: absolute;
     bottom: 0;
@@ -278,7 +358,8 @@ label {
 .form-container input[type=date]:focus,
 .form-container input[type=number]:focus {
     background-color: #ddd;
-    outline: none;
+    outline: 3px solid var(--focus-color);
+    outline-offset: 2px;
 }
 .button-col {
     display: flex;
@@ -429,6 +510,11 @@ label {
     cursor: pointer;
     font-size: 0.9rem;
     text-decoration: underline;
+}
+.table-container .sort-button {
+    color: inherit;
+    font-size: inherit;
+    text-decoration: none;
 }
 table {
     width: 100%;
