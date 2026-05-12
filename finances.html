@@ -13,13 +13,16 @@
     <title>Expenses - BizTrack</title>
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <div id="sidebar" class="sidebar">
         <div class="logo">
             <a href="./index.html">
-                <i class="fas fa-b"></i>
+                <i class="fas fa-b" aria-hidden="true"></i>
                 <span>BizTrack</span>
             </a>
-            <i class="fa-solid fa-xmark" title="Close" onclick="closeSidebar()"></i>
+            <button type="button" class="sidebar-close" aria-label="Close sidebar" onclick="closeSidebar()">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
         </div>
         <ul class="menu">
             <li>
@@ -61,19 +64,21 @@
         </ul>
     </div>
 
-    <div class="main-content">
+    <div class="main-content" id="main-content" tabindex="-1">
         <div class="header-wrapper">
-            <div class="menu-icon" onclick="openSidebar()">
-                <i class="fa-solid fa-bars"></i>
-            </div>
+            <button type="button" class="menu-icon sidebar-toggle" aria-label="Open sidebar" aria-expanded="true" onclick="openSidebar()">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            </button>
+
             <div class="header-title">
                 <!-- <span>Primary</span> -->
                 <h2>Expenses</h2>
             </div>
+
             <div class="user-info">
                 <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="search" id="searchInput" placeholder="Search">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    <input type="search" id="searchInput" placeholder="Search" aria-label="Search expenses">
                 </div>
                 <!-- <i class="fas fa-user-alt fa-xl"></i> -->
             </div>
@@ -123,12 +128,12 @@
                 <table id="finance-table">
                     <thead>
                         <tr>
-                            <th onclick="sortTable('trID')">S/N</th>
-                            <th onclick="sortTable('trDate')">Date</th>
-                            <th onclick="sortTable('trCategory')">Expense Category</th>
-                            <th onclick="sortTable('trAmount')">Amount</th>
-                            <th onclick="sortTable('trNotes')">Notes</th>
-                            <th>Action</th>
+                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('trID')" aria-label="Sort expenses by serial number">S/N</button></th>
+                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('trDate')" aria-label="Sort expenses by Date">Date</button></th>
+                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('trCategory')" aria-label="Sort expenses by Expense Category">Expense Category</button></th>
+                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('trAmount')" aria-label="Sort expenses by Amount">Amount</button></th>
+                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('trNotes')" aria-label="Sort expenses by Notes">Notes</button></th>
+                            <th scope="col">Action</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -143,7 +148,6 @@
                 </table>
             </div>
         </div>
-    </div>
     </div>
 
     <script src="./finances.js"></script>

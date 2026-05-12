@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width", initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="BizTrack Project by Sumayyah"/>
     <meta property="og:description" content="A project born out of real small business challenges, now simplifying product, order, and finance management."/>
     <meta property="og:image:secure_url" content="https://i.imgur.com/0O47fVi.jpg"/>
@@ -13,13 +13,16 @@
     <title>Orders - BizTrack</title>
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <div id="sidebar" class="sidebar">
         <div class="logo">
             <a href="./index.html">
-                <i class="fas fa-b"></i>
+                <i class="fas fa-b" aria-hidden="true"></i>
                 <span>BizTrack</span>
             </a>
-            <i class="fa-solid fa-xmark" title="Close" onclick="closeSidebar()"></i>
+            <button type="button" class="sidebar-close" aria-label="Close sidebar" onclick="closeSidebar()">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
         </div>
         <ul class="menu">
             <li>
@@ -61,19 +64,21 @@
         </ul>
     </div>
 
-    <div class="main-content">
+    <div class="main-content" id="main-content" tabindex="-1">
         <div class="header-wrapper">
-            <div class="menu-icon" onclick="openSidebar()">
-                <i class="fa-solid fa-bars"></i>
-            </div>
+            <button type="button" class="menu-icon sidebar-toggle" aria-label="Open sidebar" aria-expanded="true" onclick="openSidebar()">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            </button>
+
             <div class="header-title">
                 <!-- <span>Primary</span> -->
                 <h2>Orders</h2>
             </div>
+
             <div class="user-info">
                 <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="search" id="searchInput" placeholder="Search">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    <input type="search" id="searchInput" placeholder="Search" aria-label="Search orders">
                 </div>
                 <!-- <i class="fas fa-user-alt fa-xl"></i> -->
             </div>
@@ -147,16 +152,16 @@
                 <table id="order-table">
                     <thead>
                         <tr>
-                            <th onclick="sortTable('orderID')">Order ID</th>
-                            <th onclick="sortTable('orderDate')">Order Date</th>
-                            <th onclick="sortTable('itemName')">Item Name</th>
-                            <th onclick="sortTable('itemPrice')">Item Price</th>
-                            <th onclick="sortTable('qtyBought')">Qty</th>
-                            <th onclick="sortTable('shipping')">Shipping Fee</th>
-                            <th onclick="sortTable('taxes')">Taxes</th>
-                            <th onclick="sortTable('orderTotal')">Order Total</th>
-                            <th onclick="sortTable('orderStatus')">Order Status</th>
-                            <th>Action</th>
+                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('orderID')" aria-label="Sort orders by Order ID">Order ID</button></th>
+                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('orderDate')" aria-label="Sort orders by Order Date">Order Date</button></th>
+                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('itemName')" aria-label="Sort orders by Item Name">Item Name</button></th>
+                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('itemPrice')" aria-label="Sort orders by Item Price">Item Price</button></th>
+                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('qtyBought')" aria-label="Sort orders by Quantity">Qty</button></th>
+                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('shipping')" aria-label="Sort orders by Shipping Fee">Shipping Fee</button></th>
+                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('taxes')" aria-label="Sort orders by Taxes">Taxes</button></th>
+                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('orderTotal')" aria-label="Sort orders by Order Total">Order Total</button></th>
+                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('orderStatus')" aria-label="Sort orders by Order Status">Order Status</button></th>
+                            <th scope="col">Action</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
