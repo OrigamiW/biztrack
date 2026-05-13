@@ -448,38 +448,87 @@ function performSearch() {
 }
 
 
+const orderCsvColumns = [
+    { key: "orderID", header: "Order ID" },
+    { key: "orderDate", header: "Order Date" },
+    { key: "itemName", header: "Item Name" },
+    { key: "itemPrice", header: "Item Price" },
+    { key: "qtyBought", header: "Quantity Bought" },
+    { key: "shipping", header: "Shipping" },
+    { key: "taxes", header: "Taxes" },
+    { key: "orderTotal", header: "Order Total" },
+    { key: "orderStatus", header: "Order Status" }
+];
+
+function escapeCsvCell(value) {
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    let cell = String(value);
+
+    if (/^[=+\-@]/.test(cell)) {
+        cell = "'" + cell;
+    }
+
+    if (/[",\r\n]/.test(cell)) {
+        cell = '"' + cell.replace(/"/g, '""') + '"';
+    }
+
+    return cell;
+}
+
+function formatOrderCsvValue(order, key) {
+    const value = order[key];
+
+    if (["itemPrice", "shipping", "taxes", "orderTotal"].includes(key)) {
+        const numberValue = Number(value);
+        return Number.isFinite(numberValue) ? numberValue.toFixed(2) : "";
+    }
+
+    return value;
+}
+
+function generateCSV(data, columns, formatValue) {
+    const headerRow = columns
+        .map(column => escapeCsvCell(column.header))
+        .join(",");
+
+    if (!Array.isArray(data) || data.length === 0) {
+        return "\uFEFF" + headerRow + "\r\n";
+    }
+
+    const rows = data.map(item =>
+        columns
+            .map(column => {
+                const rawValue = formatValue
+                    ? formatValue(item, column.key)
+                    : item[column.key];
+
+                return escapeCsvCell(rawValue);
+            })
+            .join(",")
+    );
+
+    return "\uFEFF" + [headerRow, ...rows].join("\r\n");
+}
+
 function exportToCSV() {
-    const ordersToExport = orders.map(order => {
-        return {
-            orderID: order.orderID,
-            orderDate: order.orderDate,
-            itemName: order.itemName,
-            itemPrice: order.itemPrice.toFixed(2),
-            qtyBought: order.qtyBought,
-            shipping: order.shipping.toFixed(2),
-            taxes: order.taxes.toFixed(2),
-            orderTotal: order.orderTotal.toFixed(2),
-            orderStatus: order.orderStatus,
-        };
+    const csvContent = generateCSV(orders, orderCsvColumns, formatOrderCsvValue);
+
+    const blob = new Blob([csvContent], {
+        type: "text/csv;charset=utf-8;"
     });
-  
-    const csvContent = generateCSV(ordersToExport);
-  
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-  
-    const link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.download = 'biztrack_order_table.csv';
-  
+
+    const link = document.createElement("a");
+    const url = window.URL.createObjectURL(blob);
+
+    link.href = url;
+    link.download = "biztrack_order_table.csv";
+
     document.body.appendChild(link);
     link.click();
-  
     document.body.removeChild(link);
-}
-  
-function generateCSV(data) {
-    const headers = Object.keys(data[0]).join(',');
-    const rows = data.map(order => Object.values(order).join(','));
 
-    return `${headers}\n${rows.join('\n')}`;
+    window.URL.revokeObjectURL(url);
 }
