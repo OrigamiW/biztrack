@@ -312,37 +312,88 @@ function performSearch() {
 }
 
 
+const productCsvColumns = [
+    { key: "prodID", header: "Product ID" },
+    { key: "prodName", header: "Product Name" },
+    { key: "prodDesc", header: "Product Description" },
+    { key: "prodCat", header: "Product Category" },
+    { key: "prodPrice", header: "Product Price" },
+    { key: "prodSold", header: "Quantity Sold" }
+];
+
+function escapeCsvCell(value) {
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    let cell = String(value);
+
+    if (/^[=+\-@]/.test(cell)) {
+        cell = "'" + cell;
+    }
+
+    if (/[",\r\n]/.test(cell)) {
+        cell = '"' + cell.replace(/"/g, '""') + '"';
+    }
+
+    return cell;
+}
+
+function formatProductCsvValue(product, key) {
+    const value = product[key];
+
+    if (key === "prodPrice") {
+        const numberValue = Number(value);
+        return Number.isFinite(numberValue) ? numberValue.toFixed(2) : "";
+    }
+
+    return value;
+}
+
+function generateCSV(data, columns, formatValue) {
+    const headerRow = columns
+        .map(column => escapeCsvCell(column.header))
+        .join(",");
+
+    if (!Array.isArray(data) || data.length === 0) {
+        return "\uFEFF" + headerRow + "\r\n";
+    }
+
+    const rows = data.map(item =>
+        columns
+            .map(column => {
+                const rawValue = formatValue
+                    ? formatValue(item, column.key)
+                    : item[column.key];
+
+                return escapeCsvCell(rawValue);
+            })
+            .join(",")
+    );
+
+    return "\uFEFF" + [headerRow, ...rows].join("\r\n");
+}
+
 function exportToCSV() {
-  const productsToExport = products.map(product => {
-      return {
-        prodID: product.prodID,
-        prodName: product.prodName,
-        prodDesc: product.prodDesc,
-        prodCategory: product.prodCat,
-        prodPrice: product.prodPrice.toFixed(2),
-        QtySold: product.prodSold,
-      };
-  });
+    const csvContent = generateCSV(products, productCsvColumns, formatProductCsvValue);
 
-  const csvContent = generateCSV(productsToExport);
+    const blob = new Blob([csvContent], {
+        type: "text/csv;charset=utf-8;"
+    });
 
-  const blob = new Blob([csvContent], { type: 'text/csv' });
+    const link = document.createElement("a");
+    const url = window.URL.createObjectURL(blob);
 
-  const link = document.createElement('a');
-  link.href = window.URL.createObjectURL(blob);
-  link.download = 'biztrack_product_table.csv';
+    link.href = url;
+    link.download = "biztrack_product_table.csv";
 
-  document.body.appendChild(link);
-  link.click();
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 
-  document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
 }
 
-function generateCSV(data) {
-  const headers = Object.keys(data[0]).join(',');
-  const rows = data.map(order => Object.values(order).join(','));
-
-  return `${headers}\n${rows.join('\n')}`;
-}
-
-init();
+document.addEventListener("DOMContentLoaded", function () {
+    init();
+});

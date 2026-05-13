@@ -306,34 +306,83 @@ function performSearch() {
 }
 
 
+const financeCsvColumns = [
+    { key: "trID", header: "Transaction ID" },
+    { key: "trDate", header: "Transaction Date" },
+    { key: "trCategory", header: "Transaction Category" },
+    { key: "trAmount", header: "Transaction Amount" },
+    { key: "trNotes", header: "Transaction Notes" }
+];
+
+function escapeCsvCell(value) {
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    let cell = String(value);
+
+    if (/^[=+\-@]/.test(cell)) {
+        cell = "'" + cell;
+    }
+
+    if (/[",\r\n]/.test(cell)) {
+        cell = '"' + cell.replace(/"/g, '""') + '"';
+    }
+
+    return cell;
+}
+
+function formatFinanceCsvValue(transaction, key) {
+    const value = transaction[key];
+
+    if (key === "trAmount") {
+        const numberValue = Number(value);
+        return Number.isFinite(numberValue) ? numberValue.toFixed(2) : "";
+    }
+
+    return value;
+}
+
+function generateCSV(data, columns, formatValue) {
+    const headerRow = columns
+        .map(column => escapeCsvCell(column.header))
+        .join(",");
+
+    if (!Array.isArray(data) || data.length === 0) {
+        return "\uFEFF" + headerRow + "\r\n";
+    }
+
+    const rows = data.map(item =>
+        columns
+            .map(column => {
+                const rawValue = formatValue
+                    ? formatValue(item, column.key)
+                    : item[column.key];
+
+                return escapeCsvCell(rawValue);
+            })
+            .join(",")
+    );
+
+    return "\uFEFF" + [headerRow, ...rows].join("\r\n");
+}
+
 function exportToCSV() {
-    const transactionsToExport = transactions.map(transaction => {
-        return {
-            trID: transaction.trID,
-            trDate: transaction.trDate,
-            trCategory: transaction.trCategory,
-            trAmount: transaction.trAmount.toFixed(2),
-            trNotes: transaction.trNotes,
-        };
+    const csvContent = generateCSV(transactions, financeCsvColumns, formatFinanceCsvValue);
+
+    const blob = new Blob([csvContent], {
+        type: "text/csv;charset=utf-8;"
     });
-  
-    const csvContent = generateCSV(transactionsToExport);
-  
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-  
-    const link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.download = 'biztrack_expense_table.csv';
-  
+
+    const link = document.createElement("a");
+    const url = window.URL.createObjectURL(blob);
+
+    link.href = url;
+    link.download = "biztrack_expense_table.csv";
+
     document.body.appendChild(link);
     link.click();
-  
     document.body.removeChild(link);
-}
-  
-function generateCSV(data) {
-    const headers = Object.keys(data[0]).join(',');
-    const rows = data.map(order => Object.values(order).join(','));
 
-    return `${headers}\n${rows.join('\n')}`;
+    window.URL.revokeObjectURL(url);
 }
