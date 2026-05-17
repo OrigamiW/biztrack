@@ -6,7 +6,7 @@ BizTrack is a web app born from my experience running a small business. It’s a
 
 ## 📝 DEMO
 
-Please refer to --- [Live Demo](https://biztrack-sepia.vercel.app).
+Please refer to --- [https://biztrack-sepia.vercel.app](https://biztrack-sepia.vercel.app).
 
 ## 📷 Screenshots
 
