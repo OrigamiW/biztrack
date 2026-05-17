@@ -5,98 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy - BizTrack</title>
     <link rel="stylesheet" href="styles.css">
-
-    <style>
-        body {
-            display: block;
-            background: #f2f4f7;
-            color: #262626;
-            padding: 40px 20px;
-        }
-
-        .privacy-container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 40px 48px;
-            border-radius: 14px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-            line-height: 1.6;
-        }
-
-        .privacy-container h1 {
-            font-size: 32px;
-            margin-bottom: 20px;
-            color: #A37A74;
-        }
-
-        .privacy-container h2 {
-            font-size: 22px;
-            margin-top: 26px;
-            margin-bottom: 8px;
-            color: #262626;
-        }
-
-        .privacy-container p {
-            font-size: 16px;
-            margin-bottom: 12px;
-        }
-
-        .privacy-container a {
-            color: #247BA0;
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .privacy-container a:hover,
-        .privacy-container a:focus-visible {
-            text-decoration: underline;
-            outline: 3px solid #005fcc;
-            outline-offset: 3px;
-        }
-    </style>
 </head>
 <body>
 <main class="privacy-container">
-    <h1>Privacy Policy</h1>
+    <h1 data-i18n="privacyTitle">Privacy Policy</h1>
 
-    <p>
+    <p data-i18n="privacyIntro">
         BizTrack respects your privacy. This project is a small business management tool
         that stores information locally in your browser.
     </p>
 
-    <h2>What data we store</h2>
-    <p>
+    <h2 data-i18n="privacyDataTitle">What data we store</h2>
+    <p data-i18n="privacyDataText">
         BizTrack may store products, orders, expenses, language preferences, and cookie consent
         choices using your browser's localStorage.
     </p>
 
-    <h2>How we use your data</h2>
-    <p>
-        The data is used only to make the app work, such as displaying your products,
-        orders, expenses, dashboard totals, and selected language.
+    <h2 data-i18n="privacyUseTitle">How we use your data</h2>
+    <p data-i18n="privacyUseText">
+        The data is used only to make the app work.
     </p>
 
-    <h2>Where your data is stored</h2>
-    <p>
-        Your data is stored locally in your own browser. BizTrack does not send this data
-        to a server or share it with third parties.
+    <h2 data-i18n="privacyStorageTitle">Where your data is stored</h2>
+    <p data-i18n="privacyStorageText">
+        Your data is stored locally in your own browser.
     </p>
 
-    <h2>Cookies and consent</h2>
-    <p>
-        BizTrack does not use tracking cookies. It uses localStorage to remember your
-        cookie consent choice and language preference.
+    <h2 data-i18n="privacyCookiesTitle">Cookies and consent</h2>
+    <p data-i18n="privacyCookiesText">
+        BizTrack does not use tracking cookies.
     </p>
 
-    <h2>Your control</h2>
-    <p>
-        You can clear your data at any time by clearing your browser's site data or localStorage.
+    <h2 data-i18n="privacyControlTitle">Your control</h2>
+    <p data-i18n="privacyControlText">
+        You can clear your data at any time.
     </p>
 
     <p>
-        <a href="index.html">Back to Dashboard</a>
+        <a href="index.html" data-i18n="backToDashboard">Back to Dashboard</a>
     </p>
 </main>
+
+<script src="https://unpkg.com/i18next/dist/umd/i18next.min.js"></script>
+<script src="i18n.js"></script>
+<script src="privacy.js"></script>
 </body>
 </html>
