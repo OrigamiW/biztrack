@@ -1,5 +1,7 @@
 # 📋 BizTrack Project
 
+![Coverage](https://img.shields.io/badge/coverage-80%25%2B-brightgreen)
+
 BizTrack is a web app born from my experience running a small business. It’s a tool designed to simplify managing products, orders, and expenses seamlessly. As a small business owner, I created BizTrack to simplify the complexities of managing products, orders, and expenses. The inspiration for this project came from the challenges I faced in my own business. I wanted to develop a solution that could benefit “myself” and others in a similar situation.
 
 ## 📝 DEMO
@@ -37,3 +39,19 @@ This project represents my growth, determination, and love for coding. I hope yo
 ## 🤝 Acknowledgments
 
 A special thanks to my coach, [Sam](https://github.com/samwise-nl), for the invaluable guidance and support provided throughout the development of this project, and the [GetCoding NL](https://www.getcoding.ca/coaching-program-nl) software development program team for their continuous check-ins.
+
+## Testing and Code Coverage
+
+This project uses Vitest for unit testing and V8 coverage reporting.
+
+To run the test suite:
+
+```bash  
+npm test
+```
+
+To generate a code coverage report:
+```bash  
+npm run test:coverage
+```
+Current test coverage is above 80% for statements, branches, functions, and lines.

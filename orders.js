@@ -1,31 +1,30 @@
-
 function openSidebar() {
-  const side = document.getElementById("sidebar");
-  const toggleButton = document.querySelector(".sidebar-toggle");
-  const closeButton = document.querySelector(".sidebar-close");
-  const shouldOpen = side.style.display !== "block";
+    const side = document.getElementById("sidebar");
+    const toggleButton = document.querySelector(".sidebar-toggle");
+    const closeButton = document.querySelector(".sidebar-close");
+    const shouldOpen = side.style.display !== "block";
 
-  side.style.display = shouldOpen ? "block" : "none";
+    side.style.display = shouldOpen ? "block" : "none";
 
-  if (toggleButton) {
-    toggleButton.setAttribute("aria-expanded", String(shouldOpen));
-  }
+    if (toggleButton) {
+        toggleButton.setAttribute("aria-expanded", String(shouldOpen));
+    }
 
-  if (shouldOpen && closeButton) {
-    closeButton.focus();
-  }
+    if (shouldOpen && closeButton) {
+        closeButton.focus();
+    }
 }
 
 function closeSidebar() {
-  const side = document.getElementById("sidebar");
-  const toggleButton = document.querySelector(".sidebar-toggle");
+    const side = document.getElementById("sidebar");
+    const toggleButton = document.querySelector(".sidebar-toggle");
 
-  side.style.display = "none";
+    side.style.display = "none";
 
-  if (toggleButton) {
-    toggleButton.setAttribute("aria-expanded", "false");
-    toggleButton.focus();
-  }
+    if (toggleButton) {
+        toggleButton.setAttribute("aria-expanded", "false");
+        toggleButton.focus();
+    }
 }
 
 
@@ -41,6 +40,25 @@ function closeForm() {
 let orders = [];
 let products = [];
 
+function t(key) {
+    if (typeof i18next !== "undefined" && i18next.isInitialized) {
+        return i18next.t(key);
+    }
+
+    return key;
+}
+
+function translateOrderStatus(status) {
+    const statusTranslations = {
+        "Pending": "pending",
+        "Processing": "processing",
+        "Shipped": "shipped",
+        "Delivered": "delivered"
+    };
+
+    return statusTranslations[status] ? t(statusTranslations[status]) : status;
+}
+
 window.onload = function () {
     // Load products
     const storedProducts = localStorage.getItem("bizTrackProducts");
@@ -54,72 +72,79 @@ window.onload = function () {
         orders = JSON.parse(storedOrders);
     } else {
         orders = [
-        {
-            orderID: "1001",
-            orderDate: "2024-01-05",
-            itemName: "Baseball caps",
-            itemPrice: 25.00,
-            qtyBought: 2,
-            shipping: 2.50,
-            taxes: 9.00,
-            orderTotal: 61.50,
-            orderStatus: "Pending"
-        },
-        {
-            orderID: "1002",
-            orderDate: "2024-03-05",
-            itemName: "Water bottles",
-            itemPrice: 17.00,
-            qtyBought: 3,
-            shipping: 3.50,
-            taxes: 6.00,
-            orderTotal: 60.50,
-            orderStatus: "Processing"
-        },
-        {
-            orderID: "1003",
-            orderDate: "2024-02-05",
-            itemName: "Tote bags",
-            itemPrice: 20.00,
-            qtyBought: 4,
-            shipping: 2.50,
-            taxes: 2.00,
-            orderTotal: 84.50,
-            orderStatus: "Shipped"
-        },
-        {
-            orderID: "1004",
-            orderDate: "2023-01-05",
-            itemName: "Canvas prints",
-            itemPrice: 55.00,
-            qtyBought: 1,
-            shipping: 2.50,
-            taxes: 19.00,
-            orderTotal: 76.50,
-            orderStatus: "Delivered"
-        },
-        {
-            orderID: "1005",
-            orderDate: "2024-01-15",
-            itemName: "Beanies",
-            itemPrice: 15.00,
-            qtyBought: 2,
-            shipping: 3.90,
-            taxes: 4.00,
-            orderTotal: 37.90,
-            orderStatus: "Pending"
-        },
+            {
+                orderID: "1001",
+                orderDate: "2024-01-05",
+                itemName: "Baseball caps",
+                itemPrice: 25.00,
+                qtyBought: 2,
+                shipping: 2.50,
+                taxes: 9.00,
+                orderTotal: 61.50,
+                orderStatus: "Pending"
+            },
+            {
+                orderID: "1002",
+                orderDate: "2024-03-05",
+                itemName: "Water bottles",
+                itemPrice: 17.00,
+                qtyBought: 3,
+                shipping: 3.50,
+                taxes: 6.00,
+                orderTotal: 60.50,
+                orderStatus: "Processing"
+            },
+            {
+                orderID: "1003",
+                orderDate: "2024-02-05",
+                itemName: "Tote bags",
+                itemPrice: 20.00,
+                qtyBought: 4,
+                shipping: 2.50,
+                taxes: 2.00,
+                orderTotal: 84.50,
+                orderStatus: "Shipped"
+            },
+            {
+                orderID: "1004",
+                orderDate: "2023-01-05",
+                itemName: "Canvas prints",
+                itemPrice: 55.00,
+                qtyBought: 1,
+                shipping: 2.50,
+                taxes: 19.00,
+                orderTotal: 76.50,
+                orderStatus: "Delivered"
+            },
+            {
+                orderID: "1005",
+                orderDate: "2024-01-15",
+                itemName: "Beanies",
+                itemPrice: 15.00,
+                qtyBought: 2,
+                shipping: 3.90,
+                taxes: 4.00,
+                orderTotal: 37.90,
+                orderStatus: "Pending"
+            },
         ];
 
         localStorage.setItem("bizTrackOrders", JSON.stringify(orders));
     }
     populateProductSelect();
     renderOrders(orders);
+
+    if (typeof i18next !== "undefined") {
+        i18next.on("languageChanged", function () {
+            populateProductSelect();
+            renderOrders(orders);
+        });
+    }
 }
 
 function populateProductSelect() {
     const productSelect = document.getElementById("product-select");
-    productSelect.innerHTML = '<option value="" disabled selected hidden>Choose a product</option>';
+    productSelect.innerHTML = `<option value="" disabled selected hidden>${t("chooseProduct")}</option>`;
 
     products.forEach(product => {
         const option = document.createElement("option");
@@ -145,10 +170,10 @@ function populateProductSelect() {
 }
 
 function addOrUpdate(event) {
-    let type = document.getElementById("submitBtn").textContent;
-    if (type === 'Add') {
+    let type = document.getElementById("submitBtn").dataset.mode || "add";
+    if (type === "add") {
         newOrder(event);
-    } else if (type === 'Update'){
+    } else if (type === "update"){
         const orderID = document.getElementById("order-id").value;
         updateOrder(orderID);
     }
@@ -156,166 +181,166 @@ function addOrUpdate(event) {
 
 
 function newOrder(event) {
-  event.preventDefault();
-  const orderID = document.getElementById("order-id").value;
-  const orderDate = document.getElementById("order-date").value;
-  const itemName = document.getElementById("item-name").value;
-  const itemPrice = parseFloat(document.getElementById("item-price").value);
-  const qtyBought = parseInt(document.getElementById("qty-bought").value);
-  const shipping = parseFloat(document.getElementById("shipping").value);
-  const taxes = parseFloat(document.getElementById("taxes").value);
-  const orderTotal = ((itemPrice * qtyBought) + shipping + taxes);
-  const orderStatus = document.getElementById("order-status").value;
-  const productSelect = document.getElementById("product-select").value;
+    event.preventDefault();
+    const orderID = document.getElementById("order-id").value;
+    const orderDate = document.getElementById("order-date").value;
+    const itemName = document.getElementById("item-name").value;
+    const itemPrice = parseFloat(document.getElementById("item-price").value);
+    const qtyBought = parseInt(document.getElementById("qty-bought").value);
+    const shipping = parseFloat(document.getElementById("shipping").value);
+    const taxes = parseFloat(document.getElementById("taxes").value);
+    const orderTotal = ((itemPrice * qtyBought) + shipping + taxes);
+    const orderStatus = document.getElementById("order-status").value;
+    const productSelect = document.getElementById("product-select").value;
 
-  if (isDuplicateID(orderID, null)) {
-    alert("Order ID already exists. Please use a unique ID.");
-    return;
-  }
+    if (isDuplicateID(orderID, null)) {
+        alert(t("duplicateOrderId"));
+        return;
+    }
 
-  const order = {
-    orderID,
-    orderDate,
-    itemName,
-    itemPrice,
-    qtyBought,
-    shipping,
-    taxes,
-    orderTotal,
-    orderStatus,
-    productID: productSelect
+    const order = {
+        orderID,
+        orderDate,
+        itemName,
+        itemPrice,
+        qtyBought,
+        shipping,
+        taxes,
+        orderTotal,
+        orderStatus,
+        productID: productSelect
 
-  };
+    };
 
-  orders.push(order);
-  // Update product sales quantity
-  updateProductSales(productSelect, qtyBought);
+    orders.push(order);
+    // Update product sales quantity
+    updateProductSales(productSelect, qtyBought);
 
-  renderOrders(orders);
-  localStorage.setItem("bizTrackOrders", JSON.stringify(orders));
+    renderOrders(orders);
+    localStorage.setItem("bizTrackOrders", JSON.stringify(orders));
 
-  document.getElementById("order-form").reset();
+    document.getElementById("order-form").reset();
 }
 
 function updateProductSales(productID, quantity) {
-  const productIndex = products.findIndex(p => p.prodID === productID);
-  if (productIndex !== -1) {
-    products[productIndex].prodSold += quantity;
-    localStorage.setItem("bizTrackProducts", JSON.stringify(products));
-  }
+    const productIndex = products.findIndex(p => p.prodID === productID);
+    if (productIndex !== -1) {
+        products[productIndex].prodSold += quantity;
+        localStorage.setItem("bizTrackProducts", JSON.stringify(products));
+    }
 }
 
 
 
 function createTextCell(value, className = "") {
-  const td = document.createElement("td");
-  td.textContent = value == null ? "" : String(value);
+    const td = document.createElement("td");
+    td.textContent = value == null ? "" : String(value);
 
-  if (className) {
-    td.className = className;
-  }
+    if (className) {
+        td.className = className;
+    }
 
-  return td;
+    return td;
 }
 
 function createIconButton(title, iconClass, onClick) {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "icon-button";
-  button.title = title;
-  button.setAttribute("aria-label", title);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "icon-button";
+    button.title = title;
+    button.setAttribute("aria-label", title);
 
-  const icon = document.createElement("i");
-  icon.className = iconClass;
-  icon.setAttribute("aria-hidden", "true");
+    const icon = document.createElement("i");
+    icon.className = iconClass;
+    icon.setAttribute("aria-hidden", "true");
 
-  button.appendChild(icon);
-  button.addEventListener("click", onClick);
+    button.appendChild(icon);
+    button.addEventListener("click", onClick);
 
-  return button;
+    return button;
 }
 
 function renderOrders(orders) {
-  const orderTableBody = document.getElementById("tableBody");
-  orderTableBody.replaceChildren();
+    const orderTableBody = document.getElementById("tableBody");
+    orderTableBody.replaceChildren();
 
-  const statusMap = {
-    Pending: "pending",
-    Processing: "processing",
-    Shipped: "shipped",
-    Delivered: "delivered"
-  };
+    const statusMap = {
+        Pending: "pending",
+        Processing: "processing",
+        Shipped: "shipped",
+        Delivered: "delivered"
+    };
 
-  orders.forEach(order => {
-    const orderRow = document.createElement("tr");
-    orderRow.className = "order-row";
+    orders.forEach(order => {
+        const orderRow = document.createElement("tr");
+        orderRow.className = "order-row";
 
-    orderRow.dataset.orderID = order.orderID;
-    orderRow.dataset.orderDate = order.orderDate;
-    orderRow.dataset.itemName = order.itemName;
-    orderRow.dataset.itemPrice = order.itemPrice;
-    orderRow.dataset.qtyBought = order.qtyBought;
-    orderRow.dataset.shipping = order.shipping;
-    orderRow.dataset.taxes = order.taxes;
-    orderRow.dataset.orderTotal = order.orderTotal;
-    orderRow.dataset.orderStatus = order.orderStatus;
+        orderRow.dataset.orderID = order.orderID;
+        orderRow.dataset.orderDate = order.orderDate;
+        orderRow.dataset.itemName = order.itemName;
+        orderRow.dataset.itemPrice = order.itemPrice;
+        orderRow.dataset.qtyBought = order.qtyBought;
+        orderRow.dataset.shipping = order.shipping;
+        orderRow.dataset.taxes = order.taxes;
+        orderRow.dataset.orderTotal = order.orderTotal;
+        orderRow.dataset.orderStatus = order.orderStatus;
 
-    const formattedPrice = typeof order.itemPrice === "number" ? `$${order.itemPrice.toFixed(2)}` : "";
-    const formattedShipping = typeof order.shipping === "number" ? `$${order.shipping.toFixed(2)}` : "";
-    const formattedTaxes = typeof order.taxes === "number" ? `$${order.taxes.toFixed(2)}` : "";
-    const formattedTotal = typeof order.orderTotal === "number" ? `$${order.orderTotal.toFixed(2)}` : "";
+        const formattedPrice = typeof order.itemPrice === "number" ? `$${order.itemPrice.toFixed(2)}` : "";
+        const formattedShipping = typeof order.shipping === "number" ? `$${order.shipping.toFixed(2)}` : "";
+        const formattedTaxes = typeof order.taxes === "number" ? `$${order.taxes.toFixed(2)}` : "";
+        const formattedTotal = typeof order.orderTotal === "number" ? `$${order.orderTotal.toFixed(2)}` : "";
 
-    orderRow.appendChild(createTextCell(order.orderID));
-    orderRow.appendChild(createTextCell(order.orderDate));
-    orderRow.appendChild(createTextCell(order.itemName));
-    orderRow.appendChild(createTextCell(formattedPrice));
-    orderRow.appendChild(createTextCell(order.qtyBought));
-    orderRow.appendChild(createTextCell(formattedShipping));
-    orderRow.appendChild(createTextCell(formattedTaxes));
-    orderRow.appendChild(createTextCell(formattedTotal, "order-total"));
+        orderRow.appendChild(createTextCell(order.orderID));
+        orderRow.appendChild(createTextCell(order.orderDate));
+        orderRow.appendChild(createTextCell(order.itemName));
+        orderRow.appendChild(createTextCell(formattedPrice));
+        orderRow.appendChild(createTextCell(order.qtyBought));
+        orderRow.appendChild(createTextCell(formattedShipping));
+        orderRow.appendChild(createTextCell(formattedTaxes));
+        orderRow.appendChild(createTextCell(formattedTotal, "order-total"));
 
-    const statusCell = document.createElement("td");
-    const statusDiv = document.createElement("div");
-    statusDiv.className = `status ${statusMap[order.orderStatus] || ""}`;
+        const statusCell = document.createElement("td");
+        const statusDiv = document.createElement("div");
+        statusDiv.className = `status ${statusMap[order.orderStatus] || ""}`;
 
-    const statusText = document.createElement("span");
-    statusText.textContent = order.orderStatus;
+        const statusText = document.createElement("span");
+        statusText.textContent = translateOrderStatus(order.orderStatus);
 
-    statusDiv.appendChild(statusText);
-    statusCell.appendChild(statusDiv);
-    orderRow.appendChild(statusCell);
+        statusDiv.appendChild(statusText);
+        statusCell.appendChild(statusDiv);
+        orderRow.appendChild(statusCell);
 
-    const actionCell = document.createElement("td");
-    actionCell.className = "action";
+        const actionCell = document.createElement("td");
+        actionCell.className = "action";
 
-    actionCell.appendChild(
-      createIconButton(
-        `Edit order ${order.orderID}`,
-        "edit-icon fa-solid fa-pen-to-square",
-        () => editRow(order.orderID)
-      )
-    );
+        actionCell.appendChild(
+            createIconButton(
+                `${t("edit")} ${t("orders")} ${order.orderID}`,
+                "edit-icon fa-solid fa-pen-to-square",
+                () => editRow(order.orderID)
+            )
+        );
 
-    actionCell.appendChild(
-      createIconButton(
-        `Delete order ${order.orderID}`,
-        "delete-icon fas fa-trash-alt",
-        () => deleteOrder(order.orderID)
-      )
-    );
+        actionCell.appendChild(
+            createIconButton(
+                `${t("delete")} ${t("orders")} ${order.orderID}`,
+                "delete-icon fas fa-trash-alt",
+                () => deleteOrder(order.orderID)
+            )
+        );
 
-    orderRow.appendChild(actionCell);
-    orderTableBody.appendChild(orderRow);
-  });
+        orderRow.appendChild(actionCell);
+        orderTableBody.appendChild(orderRow);
+    });
 
-  displayRevenue();
+    displayRevenue();
 }
 
 function displayRevenue() {
-  const resultElement = document.getElementById("total-revenue");
-  const totalRevenue = orders.reduce((total, order) => total + order.orderTotal, 0);
+    const resultElement = document.getElementById("total-revenue");
+    const totalRevenue = orders.reduce((total, order) => total + order.orderTotal, 0);
 
-  resultElement.textContent = `Total Revenue: $${totalRevenue.toFixed(2)}`;
+    resultElement.textContent = `${t("totalRevenue")}: $${totalRevenue.toFixed(2)}`;
 }
 
 function editRow(orderID) {
@@ -331,27 +356,28 @@ function editRow(orderID) {
     document.getElementById("order-total").value = orderToEdit.orderTotal;
     document.getElementById("order-status").value = orderToEdit.orderStatus;
 
-    document.getElementById("submitBtn").textContent = "Update";
+    document.getElementById("submitBtn").textContent = t("update");
+    document.getElementById("submitBtn").dataset.mode = "update";
 
     document.getElementById("order-form").style.display = "block";
 }
 
 function deleteOrder(orderID) {
-  const indexToDelete = orders.findIndex(order => order.orderID === orderID);
+    const indexToDelete = orders.findIndex(order => order.orderID === orderID);
 
-  if (indexToDelete !== -1) {
-      const orderToDelete = orders[indexToDelete];
-      // Update product sales quantity by subtracting the deleted order's quantity
-      if (orderToDelete.productID) {
-          updateProductSales(orderToDelete.productID, -orderToDelete.qtyBought);
-      }
+    if (indexToDelete !== -1) {
+        const orderToDelete = orders[indexToDelete];
+        // Update product sales quantity by subtracting the deleted order's quantity
+        if (orderToDelete.productID) {
+            updateProductSales(orderToDelete.productID, -orderToDelete.qtyBought);
+        }
 
-      orders.splice(indexToDelete, 1);
+        orders.splice(indexToDelete, 1);
 
-      localStorage.setItem("bizTrackOrders", JSON.stringify(orders));
+        localStorage.setItem("bizTrackOrders", JSON.stringify(orders));
 
-      renderOrders(orders);
-  }
+        renderOrders(orders);
+    }
 }
 
 function updateOrder(orderID) {
@@ -381,7 +407,7 @@ function updateOrder(orderID) {
         };
 
         if (isDuplicateID(updatedOrder.orderID, orderID)) {
-            alert("Order ID already exists. Please use a unique ID.");
+            alert(t("duplicateOrderId"));
             return;
         }
         // Update product sales quantity
@@ -399,7 +425,8 @@ function updateOrder(orderID) {
         renderOrders(orders);
 
         document.getElementById("order-form").reset();
-        document.getElementById("submitBtn").textContent = "Add";
+        document.getElementById("submitBtn").textContent = t("add");
+        document.getElementById("submitBtn").dataset.mode = "add";
     }
 }
 
@@ -532,3 +559,29 @@ function exportToCSV() {
 
     window.URL.revokeObjectURL(url);
 }
+
+document.addEventListener("i18nReady", function () {
+    populateProductSelect();
+    renderOrders(orders);
+});
+
+window.openSidebar = openSidebar;
+window.closeSidebar = closeSidebar;
+window.openForm = openForm;
+window.closeForm = closeForm;
+window.addOrUpdate = addOrUpdate;
+window.newOrder = newOrder;
+window.editRow = editRow;
+window.updateOrder = updateOrder;
+window.deleteOrder = deleteOrder;
+window.displayRevenue = displayRevenue;
+window.isDuplicateID = isDuplicateID;
+window.renderOrders = renderOrders;
+window.sortTable = sortTable;
+window.performSearch = performSearch;
+window.generateCSV = generateCSV;
+window.escapeCsvCell = escapeCsvCell;
+window.exportToCSV = exportToCSV;
+window.formatOrderCsvValue = formatOrderCsvValue;
+window.translateOrderStatus = translateOrderStatus;
+window.populateProductSelect = populateProductSelect;

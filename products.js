@@ -1,31 +1,30 @@
-
 function openSidebar() {
-  const side = document.getElementById("sidebar");
-  const toggleButton = document.querySelector(".sidebar-toggle");
-  const closeButton = document.querySelector(".sidebar-close");
-  const shouldOpen = side.style.display !== "block";
+    const side = document.getElementById("sidebar");
+    const toggleButton = document.querySelector(".sidebar-toggle");
+    const closeButton = document.querySelector(".sidebar-close");
+    const shouldOpen = side.style.display !== "block";
 
-  side.style.display = shouldOpen ? "block" : "none";
+    side.style.display = shouldOpen ? "block" : "none";
 
-  if (toggleButton) {
-    toggleButton.setAttribute("aria-expanded", String(shouldOpen));
-  }
+    if (toggleButton) {
+        toggleButton.setAttribute("aria-expanded", String(shouldOpen));
+    }
 
-  if (shouldOpen && closeButton) {
-    closeButton.focus();
-  }
+    if (shouldOpen && closeButton) {
+        closeButton.focus();
+    }
 }
 
 function closeSidebar() {
-  const side = document.getElementById("sidebar");
-  const toggleButton = document.querySelector(".sidebar-toggle");
+    const side = document.getElementById("sidebar");
+    const toggleButton = document.querySelector(".sidebar-toggle");
 
-  side.style.display = "none";
+    side.style.display = "none";
 
-  if (toggleButton) {
-    toggleButton.setAttribute("aria-expanded", "false");
-    toggleButton.focus();
-  }
+    if (toggleButton) {
+        toggleButton.setAttribute("aria-expanded", "false");
+        toggleButton.focus();
+    }
 }
 
 
@@ -41,202 +40,252 @@ function closeForm() {
 
 let products = [];
 
-function init() {
-  const storedProducts = localStorage.getItem("bizTrackProducts");
-  if (storedProducts) {
-      products = JSON.parse(storedProducts);
-  } else {
-      products = [
-        {
-          prodID: "PD001",
-          prodName: "Baseball caps",
-          prodDesc: "Peace embroidered cap",
-          prodCat: "Hats",
-          prodPrice: 25.00,
-          prodSold: 20
-        },
-        {
-          prodID: "PD002",
-          prodName: "Water bottles",
-          prodDesc: "Floral lotus printed bottle",
-          prodCat: "Drinkware",
-          prodPrice: 48.50,
-          prodSold: 10
-        },
-        {
-          prodID: "PD003",
-          prodName: "Sweatshirts",
-          prodDesc: "Palestine sweater",
-          prodCat: "Clothing",
-          prodPrice: 17.50,
-          prodSold: 70
-        },
-        {
-          prodID: "PD004",
-          prodName: "Posters",
-          prodDesc: "Vibes printed poster",
-          prodCat: "Home decor",
-          prodPrice: 12.00,
-          prodSold: 60
-        },
-        {
-          prodID: "PD005",
-          prodName: "Pillow cases",
-          prodDesc: "Morrocan print pillow case",
-          prodCat: "Accessories",
-          prodPrice: 17.00,
-          prodSold: 40
-        },
-      ];
+function t(key) {
+    if (typeof i18next !== "undefined" && i18next.isInitialized) {
+        return i18next.t(key);
+    }
 
-      localStorage.setItem("bizTrackProducts", JSON.stringify(products));
+    return key;
+}
+
+function translateProductName(name) {
+    const productNameTranslations = {
+        "Baseball caps": "baseballCaps",
+        "Snapbacks": "snapbacks",
+        "Beanies": "beanies",
+        "Bucket hats": "bucketHats",
+        "Mugs": "mugs",
+        "Water bottles": "waterBottles",
+        "Tumblers": "tumblers",
+        "T-shirts": "tshirts",
+        "Sweatshirts": "sweatshirts",
+        "Hoodies": "hoodies",
+        "Pillow cases": "pillowCases",
+        "Tote bags": "toteBags",
+        "Stickers": "stickers",
+        "Posters": "posters",
+        "Framed posters": "framedPosters",
+        "Canvas prints": "canvasPrints"
+    };
+
+    return productNameTranslations[name] ? t(productNameTranslations[name]) : name;
+}
+
+function translateProductCategory(category) {
+    const productCategoryTranslations = {
+        "Hats": "hats",
+        "Drinkware": "drinkware",
+        "Clothing": "clothing",
+        "Accessories": "accessories",
+        "Home decor": "homeDecor"
+    };
+
+    return productCategoryTranslations[category] ? t(productCategoryTranslations[category]) : category;
+}
+
+function init() {
+    const storedProducts = localStorage.getItem("bizTrackProducts");
+    if (storedProducts) {
+        products = JSON.parse(storedProducts);
+    } else {
+        products = [
+            {
+                prodID: "PD001",
+                prodName: "Baseball caps",
+                prodDesc: "Peace embroidered cap",
+                prodCat: "Hats",
+                prodPrice: 25.00,
+                prodSold: 20
+            },
+            {
+                prodID: "PD002",
+                prodName: "Water bottles",
+                prodDesc: "Floral lotus printed bottle",
+                prodCat: "Drinkware",
+                prodPrice: 48.50,
+                prodSold: 10
+            },
+            {
+                prodID: "PD003",
+                prodName: "Sweatshirts",
+                prodDesc: "Palestine sweater",
+                prodCat: "Clothing",
+                prodPrice: 17.50,
+                prodSold: 70
+            },
+            {
+                prodID: "PD004",
+                prodName: "Posters",
+                prodDesc: "Vibes printed poster",
+                prodCat: "Home decor",
+                prodPrice: 12.00,
+                prodSold: 60
+            },
+            {
+                prodID: "PD005",
+                prodName: "Pillow cases",
+                prodDesc: "Morrocan print pillow case",
+                prodCat: "Accessories",
+                prodPrice: 17.00,
+                prodSold: 40
+            },
+        ];
+
+        localStorage.setItem("bizTrackProducts", JSON.stringify(products));
     }
 
     renderProducts(products);
+
+    if (typeof i18next !== "undefined") {
+        i18next.on("languageChanged", function () {
+            renderProducts(products);
+        });
+    }
 }
 
 function addOrUpdate(event) {
-  let type = document.getElementById("submitBtn").textContent;
-  if (type === 'Add') {
-      newProduct(event);
-  } else if (type === 'Update'){
-      const prodID = document.getElementById("product-id").value;
-      updateProduct(prodID);
-  }
+    let type = document.getElementById("submitBtn").dataset.mode || "add";
+    if (type === "add") {
+        newProduct(event);
+    } else if (type === "update"){
+        const prodID = document.getElementById("product-id").value;
+        updateProduct(prodID);
+    }
 }
 
 function newProduct(event) {
-  event.preventDefault();
-  const prodID = document.getElementById("product-id").value;
-  const prodName = document.getElementById("product-name").value;
-  const prodDesc = document.getElementById("product-desc").value;
-  const prodCat = document.getElementById("product-cat").value;
-  const prodPrice = parseFloat(document.getElementById("product-price").value);
-  const prodSold = parseInt(document.getElementById("product-sold").value);
+    event.preventDefault();
+    const prodID = document.getElementById("product-id").value;
+    const prodName = document.getElementById("product-name").value;
+    const prodDesc = document.getElementById("product-desc").value;
+    const prodCat = document.getElementById("product-cat").value;
+    const prodPrice = parseFloat(document.getElementById("product-price").value);
+    const prodSold = parseInt(document.getElementById("product-sold").value);
 
-  if (isDuplicateID(prodID, null)) {
-    alert("Product ID already exists. Please use a unique ID.");
-    return;
-  }
+    if (isDuplicateID(prodID, null)) {
+        alert(t("duplicateProductId"));
+        return;
+    }
 
-  const product = {
-    prodID,
-    prodName,
-    prodDesc,
-    prodCat,
-    prodPrice,
-    prodSold,
-  };
+    const product = {
+        prodID,
+        prodName,
+        prodDesc,
+        prodCat,
+        prodPrice,
+        prodSold,
+    };
 
-  products.push(product);
+    products.push(product);
 
-  renderProducts(products);
-  localStorage.setItem("bizTrackProducts", JSON.stringify(products));
+    renderProducts(products);
+    localStorage.setItem("bizTrackProducts", JSON.stringify(products));
 
-  document.getElementById("product-form").reset();
+    document.getElementById("product-form").reset();
 }
 
 function createTextCell(value, className = "") {
-  const td = document.createElement("td");
-  td.textContent = value == null ? "" : String(value);
+    const td = document.createElement("td");
+    td.textContent = value == null ? "" : String(value);
 
-  if (className) {
-    td.className = className;
-  }
+    if (className) {
+        td.className = className;
+    }
 
-  return td;
+    return td;
 }
 
 function createIconButton(title, iconClass, onClick) {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "icon-button";
-  button.title = title;
-  button.setAttribute("aria-label", title);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "icon-button";
+    button.title = title;
+    button.setAttribute("aria-label", title);
 
-  const icon = document.createElement("i");
-  icon.className = iconClass;
-  icon.setAttribute("aria-hidden", "true");
+    const icon = document.createElement("i");
+    icon.className = iconClass;
+    icon.setAttribute("aria-hidden", "true");
 
-  button.appendChild(icon);
-  button.addEventListener("click", onClick);
+    button.appendChild(icon);
+    button.addEventListener("click", onClick);
 
-  return button;
+    return button;
 }
 
 function renderProducts(products) {
-  const prodTableBody = document.getElementById("tableBody");
-  prodTableBody.replaceChildren();
+    const prodTableBody = document.getElementById("tableBody");
+    prodTableBody.replaceChildren();
 
-  const prodToRender = products;
+    const prodToRender = products;
 
-  prodToRender.forEach(product => {
-      const prodRow = document.createElement("tr");
-      prodRow.className = "product-row";
+    prodToRender.forEach(product => {
+        const prodRow = document.createElement("tr");
+        prodRow.className = "product-row";
 
-      prodRow.dataset.prodID = product.prodID;
-      prodRow.dataset.prodName = product.prodName;
-      prodRow.dataset.prodDesc = product.prodDesc;
-      prodRow.dataset.prodCat = product.prodCat;
-      prodRow.dataset.prodPrice = product.prodPrice;
-      prodRow.dataset.prodSold = product.prodSold;
+        prodRow.dataset.prodID = product.prodID;
+        prodRow.dataset.prodName = product.prodName;
+        prodRow.dataset.prodDesc = product.prodDesc;
+        prodRow.dataset.prodCat = product.prodCat;
+        prodRow.dataset.prodPrice = product.prodPrice;
+        prodRow.dataset.prodSold = product.prodSold;
 
-      prodRow.appendChild(createTextCell(product.prodID));
-      prodRow.appendChild(createTextCell(product.prodName));
-      prodRow.appendChild(createTextCell(product.prodDesc));
-      prodRow.appendChild(createTextCell(product.prodCat));
-      prodRow.appendChild(createTextCell(`$${Number(product.prodPrice).toFixed(2)}`));
-      prodRow.appendChild(createTextCell(product.prodSold));
+        prodRow.appendChild(createTextCell(product.prodID));
+        prodRow.appendChild(createTextCell(translateProductName(product.prodName)));
+        prodRow.appendChild(createTextCell(product.prodDesc));
+        prodRow.appendChild(createTextCell(translateProductCategory(product.prodCat)));
+        prodRow.appendChild(createTextCell(`$${Number(product.prodPrice).toFixed(2)}`));
+        prodRow.appendChild(createTextCell(product.prodSold));
 
-      const actionCell = document.createElement("td");
-      actionCell.className = "action";
+        const actionCell = document.createElement("td");
+        actionCell.className = "action";
 
-      actionCell.appendChild(
-        createIconButton(
-          `Edit product ${product.prodID}`,
-          "edit-icon fa-solid fa-pen-to-square",
-          () => editRow(product.prodID)
-        )
-      );
+        actionCell.appendChild(
+            createIconButton(
+                `${t("edit")} ${t("products")} ${product.prodID}`,
+                "edit-icon fa-solid fa-pen-to-square",
+                () => editRow(product.prodID)
+            )
+        );
 
-      actionCell.appendChild(
-        createIconButton(
-          `Delete product ${product.prodID}`,
-          "delete-icon fas fa-trash-alt",
-          () => deleteProduct(product.prodID)
-        )
-      );
+        actionCell.appendChild(
+            createIconButton(
+                `${t("delete")} ${t("products")} ${product.prodID}`,
+                "delete-icon fas fa-trash-alt",
+                () => deleteProduct(product.prodID)
+            )
+        );
 
-      prodRow.appendChild(actionCell);
-      prodTableBody.appendChild(prodRow);
-  });
+        prodRow.appendChild(actionCell);
+        prodTableBody.appendChild(prodRow);
+    });
 }
 
 function editRow(prodID) {
-  const productToEdit = products.find(product => product.prodID === prodID);
+    const productToEdit = products.find(product => product.prodID === prodID);
 
-  document.getElementById("product-id").value = productToEdit.prodID;
-  document.getElementById("product-name").value = productToEdit.prodName;
-  document.getElementById("product-desc").value = productToEdit.prodDesc;
-  document.getElementById("product-cat").value = productToEdit.prodCat;
-  document.getElementById("product-price").value = productToEdit.prodPrice;
-  document.getElementById("product-sold").value = productToEdit.prodSold;
+    document.getElementById("product-id").value = productToEdit.prodID;
+    document.getElementById("product-name").value = productToEdit.prodName;
+    document.getElementById("product-desc").value = productToEdit.prodDesc;
+    document.getElementById("product-cat").value = productToEdit.prodCat;
+    document.getElementById("product-price").value = productToEdit.prodPrice;
+    document.getElementById("product-sold").value = productToEdit.prodSold;
 
-  document.getElementById("submitBtn").textContent = "Update";
+    document.getElementById("submitBtn").textContent = t("update");
+    document.getElementById("submitBtn").dataset.mode = "update";
 
-  document.getElementById("product-form").style.display = "block";
+    document.getElementById("product-form").style.display = "block";
 }
 
 function deleteProduct(prodID) {
-  const indexToDelete = products.findIndex(product => product.prodID === prodID);
+    const indexToDelete = products.findIndex(product => product.prodID === prodID);
 
-  if (indexToDelete !== -1) {
-      products.splice(indexToDelete, 1);
+    if (indexToDelete !== -1) {
+        products.splice(indexToDelete, 1);
 
-      localStorage.setItem("bizTrackProducts", JSON.stringify(products));
+        localStorage.setItem("bizTrackProducts", JSON.stringify(products));
 
-      renderProducts(products);
-  }
+        renderProducts(products);
+    }
 }
 
 function updateProduct(prodID) {
@@ -253,7 +302,7 @@ function updateProduct(prodID) {
         };
 
         if (isDuplicateID(updatedProduct.prodID, prodID)) {
-            alert("Product ID already exists. Please use a unique ID.");
+            alert(t("duplicateProductId"));
             return;
         }
 
@@ -264,7 +313,8 @@ function updateProduct(prodID) {
         renderProducts(products);
 
         document.getElementById("product-form").reset();
-        document.getElementById("submitBtn").textContent = "Add";
+        document.getElementById("submitBtn").textContent = t("add");
+        document.getElementById("submitBtn").dataset.mode = "add";
     }
 }
 
@@ -394,6 +444,30 @@ function exportToCSV() {
     window.URL.revokeObjectURL(url);
 }
 
+document.addEventListener("i18nReady", function () {
+    renderProducts(products);
+});
+
 document.addEventListener("DOMContentLoaded", function () {
     init();
 });
+
+window.openSidebar = openSidebar;
+window.closeSidebar = closeSidebar;
+window.openForm = openForm;
+window.closeForm = closeForm;
+window.init = init;
+window.addOrUpdate = addOrUpdate;
+window.newProduct = newProduct;
+window.editRow = editRow;
+window.deleteProduct = deleteProduct;
+window.updateProduct = updateProduct;
+window.isDuplicateID = isDuplicateID;
+window.renderProducts = renderProducts;
+window.sortTable = sortTable;
+window.performSearch = performSearch;
+window.generateCSV = generateCSV;
+window.escapeCsvCell = escapeCsvCell;
+window.exportToCSV = exportToCSV;
+window.formatProductCsvValue = formatProductCsvValue;
+window.translateProductCategory = translateProductCategory;

@@ -763,3 +763,38 @@ ol {
   align-items: center;
 }
 
+#cookie-banner {
+    position: fixed;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    background-color: #ffffff;
+    color: #222222;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#cookie-banner p {
+    margin: 0;
+    font-size: 14px;
+}
+
+#cookie-banner button {
+    border: none;
+    background-color: #247BA0;
+    color: #ffffff;
+    padding: 8px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#cookie-banner button:hover {
+    background-color: #1b5f7a;
+}
