@@ -99,6 +99,16 @@ describe("products.js", () => {
         expect(document.querySelectorAll(".product-row").length).toBe(5);
     });
 
+    it("init should reset default product sales to zero when there are no linked orders", () => {
+        localStorage.setItem("bizTrackOrders", JSON.stringify([]));
+
+        window.init();
+
+        const storedProducts = JSON.parse(localStorage.getItem("bizTrackProducts"));
+
+        expect(storedProducts.every(product => product.prodSold === 0)).toBe(true);
+    });
+
     it("init should load products from localStorage when available", () => {
         localStorage.setItem("bizTrackProducts", JSON.stringify([
             {

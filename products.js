@@ -110,11 +110,6 @@ function productHasLinkedOrders(prodID) {
 
 function syncProductSalesFromOrders() {
     const orders = getLinkedOrders();
-
-    if (orders.length === 0) {
-        return;
-    }
-
     const soldByProduct = new Map(products.map(product => [product.prodID, 0]));
 
     orders.forEach(order => {
@@ -145,7 +140,7 @@ function init() {
                 prodDesc: "Peace embroidered cap",
                 prodCat: "Hats",
                 prodPrice: 25.00,
-                prodSold: 20
+                prodSold: 0
             },
             {
                 prodID: "PD002",
@@ -153,7 +148,7 @@ function init() {
                 prodDesc: "Floral lotus printed bottle",
                 prodCat: "Drinkware",
                 prodPrice: 48.50,
-                prodSold: 10
+                prodSold: 0
             },
             {
                 prodID: "PD003",
@@ -161,7 +156,7 @@ function init() {
                 prodDesc: "Palestine sweater",
                 prodCat: "Clothing",
                 prodPrice: 17.50,
-                prodSold: 70
+                prodSold: 0
             },
             {
                 prodID: "PD004",
@@ -169,7 +164,7 @@ function init() {
                 prodDesc: "Vibes printed poster",
                 prodCat: "Home decor",
                 prodPrice: 12.00,
-                prodSold: 60
+                prodSold: 0
             },
             {
                 prodID: "PD005",
@@ -177,7 +172,7 @@ function init() {
                 prodDesc: "Morrocan print pillow case",
                 prodCat: "Accessories",
                 prodPrice: 17.00,
-                prodSold: 40
+                prodSold: 0
             },
         ];
 

@@ -144,15 +144,18 @@ function findProductForOrder(order) {
         if (product) return product;
     }
 
+    const nameMatchedProduct = products.find(item =>
+        item.prodName.toLowerCase() === String(order.itemName || "").toLowerCase()
+    );
+    if (nameMatchedProduct) return nameMatchedProduct;
+
     const mappedProductID = DEFAULT_ORDER_PRODUCT_IDS[order.orderID];
     if (mappedProductID) {
         const mappedProduct = products.find(item => item.prodID === mappedProductID);
         if (mappedProduct) return mappedProduct;
     }
 
-    return products.find(item =>
-        item.prodName.toLowerCase() === String(order.itemName || "").toLowerCase()
-    );
+    return undefined;
 }
 
 function normaliseOrdersWithProducts() {
