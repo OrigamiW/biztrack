@@ -182,16 +182,24 @@ describe("products.js", () => {
         expect(document.getElementById("submitBtn").dataset.mode).toBe("add");
     });
 
-    it("updateProduct should not allow duplicate product ID", () => {
+    it("updateProduct should preserve the original product ID during edit", () => {
         window.init();
 
         window.editRow("PD001");
 
         document.getElementById("product-id").value = "PD002";
+        document.getElementById("product-name").value = "Updated Product";
+        document.getElementById("product-desc").value = "Updated description";
+        document.getElementById("product-cat").value = "Hats";
+        document.getElementById("product-price").value = "99.99";
 
         window.updateProduct("PD001");
 
-        expect(window.alert).toHaveBeenCalledWith("duplicateProductId");
+        const storedProducts = JSON.parse(localStorage.getItem("bizTrackProducts"));
+
+        expect(storedProducts[0].prodID).toBe("PD001");
+        expect(storedProducts[0].prodName).toBe("Updated Product");
+        expect(window.alert).not.toHaveBeenCalledWith("duplicateProductId");
     });
 
     it("deleteProduct should remove a product", () => {
@@ -203,6 +211,32 @@ describe("products.js", () => {
 
         expect(storedProducts.length).toBe(4);
         expect(storedProducts.some(product => product.prodID === "PD001")).toBe(false);
+    });
+
+    it("deleteProduct should prevent deleting a product linked to orders", () => {
+        localStorage.setItem("bizTrackOrders", JSON.stringify([
+            {
+                orderID: "1001",
+                orderDate: "2024-01-05",
+                productID: "PD001",
+                itemName: "Baseball caps",
+                itemPrice: 25,
+                qtyBought: 2,
+                shipping: 2.5,
+                taxes: 9,
+                orderTotal: 61.5,
+                orderStatus: "Pending"
+            }
+        ]));
+
+        window.init();
+
+        window.deleteProduct("PD001");
+
+        const storedProducts = JSON.parse(localStorage.getItem("bizTrackProducts"));
+
+        expect(storedProducts.some(product => product.prodID === "PD001")).toBe(true);
+        expect(window.alert).toHaveBeenCalledWith("productLinkedToOrders");
     });
 
     it("isDuplicateID should detect duplicate product IDs", () => {

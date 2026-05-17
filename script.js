@@ -143,8 +143,27 @@ function calculateRevTotal(orders) {
 
 // BAR CHART
 
-function calculateCategorySales(products) {
+function calculateCategorySales(products, orders = []) {
   const categorySales = {};
+
+  if (Array.isArray(orders) && orders.length > 0) {
+    const productById = new Map(products.map(product => [product.prodID, product]));
+
+    orders.forEach(order => {
+      const product = productById.get(order.productID)
+          || products.find(item => item.prodName === order.itemName);
+      const category = product ? product.prodCat : "Uncategorised";
+      const lineTotal = (Number(order.itemPrice) || 0) * (Number(order.qtyBought) || 0);
+
+      if (!categorySales[category]) {
+        categorySales[category] = 0;
+      }
+
+      categorySales[category] += lineTotal;
+    });
+
+    return categorySales;
+  }
 
   products.forEach(product => {
     const category = product.prodCat;
@@ -171,7 +190,8 @@ function initializeChart() {
 
   // Always load fresh data from localStorage
   const items = JSON.parse(localStorage.getItem('bizTrackProducts')) || [];
-  const categorySalesData = calculateCategorySales(items);
+  const orders = JSON.parse(localStorage.getItem('bizTrackOrders')) || [];
+  const categorySalesData = calculateCategorySales(items, orders);
 
   const sortedCategorySales = Object.entries(categorySalesData)
       .sort(([, a], [, b]) => b - a)

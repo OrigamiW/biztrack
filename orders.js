@@ -58,79 +58,151 @@ function translateOrderStatus(status) {
 
     return statusTranslations[status] ? t(statusTranslations[status]) : status;
 }
+const DEFAULT_PRODUCTS = [
+    { prodID: "PD001", prodName: "Baseball caps", prodDesc: "Peace embroidered cap", prodCat: "Hats", prodPrice: 25.00, prodSold: 0 },
+    { prodID: "PD002", prodName: "Water bottles", prodDesc: "Floral lotus printed bottle", prodCat: "Drinkware", prodPrice: 48.50, prodSold: 0 },
+    { prodID: "PD003", prodName: "Sweatshirts", prodDesc: "Palestine sweater", prodCat: "Clothing", prodPrice: 17.50, prodSold: 0 },
+    { prodID: "PD004", prodName: "Posters", prodDesc: "Vibes printed poster", prodCat: "Home decor", prodPrice: 12.00, prodSold: 0 },
+    { prodID: "PD005", prodName: "Pillow cases", prodDesc: "Morrocan print pillow case", prodCat: "Accessories", prodPrice: 17.00, prodSold: 0 }
+];
+
+const DEFAULT_ORDER_PRODUCT_IDS = {
+    "1001": "PD001",
+    "1002": "PD002",
+    "1003": "PD003",
+    "1004": "PD004",
+    "1005": "PD005"
+};
+
+function createDefaultOrder(orderID, orderDate, productID, qtyBought, shipping, taxes, orderStatus) {
+    const product = DEFAULT_PRODUCTS.find(item => item.prodID === productID);
+    const itemPrice = product ? Number(product.prodPrice) : 0;
+
+    return {
+        orderID,
+        orderDate,
+        productID,
+        itemName: product ? product.prodName : "",
+        itemPrice,
+        qtyBought,
+        shipping,
+        taxes,
+        orderTotal: (itemPrice * qtyBought) + shipping + taxes,
+        orderStatus
+    };
+}
+
+const DEFAULT_ORDERS = [
+    createDefaultOrder("1001", "2024-01-05", "PD001", 2, 2.50, 9.00, "Pending"),
+    createDefaultOrder("1002", "2024-03-05", "PD002", 3, 3.50, 6.00, "Processing"),
+    createDefaultOrder("1003", "2024-02-05", "PD003", 4, 2.50, 2.00, "Shipped"),
+    createDefaultOrder("1004", "2023-01-05", "PD004", 1, 2.50, 19.00, "Delivered"),
+    createDefaultOrder("1005", "2024-01-15", "PD005", 2, 3.90, 4.00, "Pending")
+];
+
+function loadProducts() {
+    const storedProducts = localStorage.getItem("bizTrackProducts");
+
+    if (storedProducts) {
+        try {
+            return JSON.parse(storedProducts);
+        } catch (error) {
+            console.warn("Invalid product data in localStorage. Resetting products.", error);
+        }
+    }
+
+    localStorage.setItem("bizTrackProducts", JSON.stringify(DEFAULT_PRODUCTS));
+    return DEFAULT_PRODUCTS.map(product => ({ ...product }));
+}
+
+function loadOrders() {
+    const storedOrders = localStorage.getItem("bizTrackOrders");
+
+    if (storedOrders) {
+        try {
+            return JSON.parse(storedOrders);
+        } catch (error) {
+            console.warn("Invalid order data in localStorage. Resetting orders.", error);
+        }
+    }
+
+    localStorage.setItem("bizTrackOrders", JSON.stringify(DEFAULT_ORDERS));
+    return DEFAULT_ORDERS.map(order => ({ ...order }));
+}
+
+function saveOrders() {
+    localStorage.setItem("bizTrackOrders", JSON.stringify(orders));
+}
+
+function saveProducts() {
+    localStorage.setItem("bizTrackProducts", JSON.stringify(products));
+}
+
+function findProductForOrder(order) {
+    if (order.productID) {
+        const product = products.find(item => item.prodID === order.productID);
+        if (product) return product;
+    }
+
+    const mappedProductID = DEFAULT_ORDER_PRODUCT_IDS[order.orderID];
+    if (mappedProductID) {
+        const mappedProduct = products.find(item => item.prodID === mappedProductID);
+        if (mappedProduct) return mappedProduct;
+    }
+
+    return products.find(item =>
+        item.prodName.toLowerCase() === String(order.itemName || "").toLowerCase()
+    );
+}
+
+function normaliseOrdersWithProducts() {
+    orders = orders.map(order => {
+        const product = findProductForOrder(order);
+        const qtyBought = Number(order.qtyBought) || 0;
+        const shipping = Number(order.shipping) || 0;
+        const taxes = Number(order.taxes) || 0;
+        const itemPrice = product ? Number(product.prodPrice) : Number(order.itemPrice) || 0;
+
+        return {
+            ...order,
+            productID: product ? product.prodID : order.productID || "",
+            itemName: product ? product.prodName : order.itemName,
+            itemPrice,
+            qtyBought,
+            shipping,
+            taxes,
+            orderTotal: (itemPrice * qtyBought) + shipping + taxes
+        };
+    });
+
+    saveOrders();
+}
+
+function syncProductSalesFromOrders() {
+    const soldByProduct = new Map(products.map(product => [product.prodID, 0]));
+
+    orders.forEach(order => {
+        if (!order.productID) return;
+
+        const quantity = Number(order.qtyBought) || 0;
+        const currentQuantity = soldByProduct.get(order.productID) || 0;
+        soldByProduct.set(order.productID, currentQuantity + quantity);
+    });
+
+    products = products.map(product => ({
+        ...product,
+        prodSold: soldByProduct.get(product.prodID) || 0
+    }));
+
+    saveProducts();
+}
 
 window.onload = function () {
-    // Load products
-    const storedProducts = localStorage.getItem("bizTrackProducts");
-    if (storedProducts) {
-        products = JSON.parse(storedProducts);
-    }
+    products = loadProducts();
+    orders = loadOrders();
 
-    // Load orders
-    const storedOrders = localStorage.getItem("bizTrackOrders");
-    if (storedOrders) {
-        orders = JSON.parse(storedOrders);
-    } else {
-        orders = [
-            {
-                orderID: "1001",
-                orderDate: "2024-01-05",
-                itemName: "Baseball caps",
-                itemPrice: 25.00,
-                qtyBought: 2,
-                shipping: 2.50,
-                taxes: 9.00,
-                orderTotal: 61.50,
-                orderStatus: "Pending"
-            },
-            {
-                orderID: "1002",
-                orderDate: "2024-03-05",
-                itemName: "Water bottles",
-                itemPrice: 17.00,
-                qtyBought: 3,
-                shipping: 3.50,
-                taxes: 6.00,
-                orderTotal: 60.50,
-                orderStatus: "Processing"
-            },
-            {
-                orderID: "1003",
-                orderDate: "2024-02-05",
-                itemName: "Tote bags",
-                itemPrice: 20.00,
-                qtyBought: 4,
-                shipping: 2.50,
-                taxes: 2.00,
-                orderTotal: 84.50,
-                orderStatus: "Shipped"
-            },
-            {
-                orderID: "1004",
-                orderDate: "2023-01-05",
-                itemName: "Canvas prints",
-                itemPrice: 55.00,
-                qtyBought: 1,
-                shipping: 2.50,
-                taxes: 19.00,
-                orderTotal: 76.50,
-                orderStatus: "Delivered"
-            },
-            {
-                orderID: "1005",
-                orderDate: "2024-01-15",
-                itemName: "Beanies",
-                itemPrice: 15.00,
-                qtyBought: 2,
-                shipping: 3.90,
-                taxes: 4.00,
-                orderTotal: 37.90,
-                orderStatus: "Pending"
-            },
-        ];
-
-        localStorage.setItem("bizTrackOrders", JSON.stringify(orders));
-    }
+    normaliseOrdersWithProducts();
+    syncProductSalesFromOrders();
     populateProductSelect();
     renderOrders(orders);
 
@@ -144,29 +216,30 @@ window.onload = function () {
 
 function populateProductSelect() {
     const productSelect = document.getElementById("product-select");
-    productSelect.innerHTML = `<option value="" disabled selected hidden>${t("chooseProduct")}</option>`;
+    productSelect.replaceChildren();
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    placeholder.hidden = true;
+    placeholder.textContent = t("chooseProduct");
+    productSelect.appendChild(placeholder);
 
     products.forEach(product => {
         const option = document.createElement("option");
         option.value = product.prodID;
-        option.textContent = `${product.prodName} - $${product.prodPrice.toFixed(2)}`;
+        option.textContent = `${product.prodName} - $${Number(product.prodPrice).toFixed(2)}`;
         productSelect.appendChild(option);
     });
 
-    // Add event listener to update price when product is selected
-    productSelect.addEventListener("change", function() {
+    productSelect.onchange = function() {
         const selectedProductId = this.value;
-        if (selectedProductId) {
-            const selectedProduct = products.find(p => p.prodID === selectedProductId);
-            if (selectedProduct) {
-                document.getElementById("item-name").value = selectedProduct.prodName;
-                document.getElementById("item-price").value = selectedProduct.prodPrice;
-            }
-        } else {
-            document.getElementById("item-name").value = "";
-            document.getElementById("item-price").value = "";
-        }
-    });
+        const selectedProduct = products.find(p => p.prodID === selectedProductId);
+
+        document.getElementById("item-name").value = selectedProduct ? selectedProduct.prodName : "";
+        document.getElementById("item-price").value = selectedProduct ? selectedProduct.prodPrice : "";
+    };
 }
 
 function addOrUpdate(event) {
@@ -182,53 +255,48 @@ function addOrUpdate(event) {
 
 function newOrder(event) {
     event.preventDefault();
+
     const orderID = document.getElementById("order-id").value;
     const orderDate = document.getElementById("order-date").value;
-    const itemName = document.getElementById("item-name").value;
-    const itemPrice = parseFloat(document.getElementById("item-price").value);
-    const qtyBought = parseInt(document.getElementById("qty-bought").value);
+    const productID = document.getElementById("product-select").value;
+    const selectedProduct = products.find(product => product.prodID === productID);
+    const qtyBought = parseInt(document.getElementById("qty-bought").value, 10);
     const shipping = parseFloat(document.getElementById("shipping").value);
     const taxes = parseFloat(document.getElementById("taxes").value);
-    const orderTotal = ((itemPrice * qtyBought) + shipping + taxes);
     const orderStatus = document.getElementById("order-status").value;
-    const productSelect = document.getElementById("product-select").value;
+
+    if (!selectedProduct) {
+        alert(t("chooseProduct"));
+        return;
+    }
 
     if (isDuplicateID(orderID, null)) {
         alert(t("duplicateOrderId"));
         return;
     }
 
+    const itemPrice = Number(selectedProduct.prodPrice);
     const order = {
         orderID,
         orderDate,
-        itemName,
+        productID,
+        itemName: selectedProduct.prodName,
         itemPrice,
         qtyBought,
         shipping,
         taxes,
-        orderTotal,
-        orderStatus,
-        productID: productSelect
-
+        orderTotal: (itemPrice * qtyBought) + shipping + taxes,
+        orderStatus
     };
 
     orders.push(order);
-    // Update product sales quantity
-    updateProductSales(productSelect, qtyBought);
-
+    saveOrders();
+    syncProductSalesFromOrders();
     renderOrders(orders);
-    localStorage.setItem("bizTrackOrders", JSON.stringify(orders));
 
     document.getElementById("order-form").reset();
 }
 
-function updateProductSales(productID, quantity) {
-    const productIndex = products.findIndex(p => p.prodID === productID);
-    if (productIndex !== -1) {
-        products[productIndex].prodSold += quantity;
-        localStorage.setItem("bizTrackProducts", JSON.stringify(products));
-    }
-}
 
 
 
@@ -284,6 +352,7 @@ function renderOrders(orders) {
         orderRow.dataset.taxes = order.taxes;
         orderRow.dataset.orderTotal = order.orderTotal;
         orderRow.dataset.orderStatus = order.orderStatus;
+        orderRow.dataset.productID = order.productID || "";
 
         const formattedPrice = typeof order.itemPrice === "number" ? `$${order.itemPrice.toFixed(2)}` : "";
         const formattedShipping = typeof order.shipping === "number" ? `$${order.shipping.toFixed(2)}` : "";
@@ -345,9 +414,13 @@ function displayRevenue() {
 
 function editRow(orderID) {
     const orderToEdit = orders.find(order => order.orderID === orderID);
+    if (!orderToEdit) return;
+
+    const productSelect = document.getElementById("product-select");
 
     document.getElementById("order-id").value = orderToEdit.orderID;
     document.getElementById("order-date").value = orderToEdit.orderDate;
+    productSelect.value = orderToEdit.productID || "";
     document.getElementById("item-name").value = orderToEdit.itemName;
     document.getElementById("item-price").value = orderToEdit.itemPrice;
     document.getElementById("qty-bought").value = orderToEdit.qtyBought;
@@ -366,16 +439,9 @@ function deleteOrder(orderID) {
     const indexToDelete = orders.findIndex(order => order.orderID === orderID);
 
     if (indexToDelete !== -1) {
-        const orderToDelete = orders[indexToDelete];
-        // Update product sales quantity by subtracting the deleted order's quantity
-        if (orderToDelete.productID) {
-            updateProductSales(orderToDelete.productID, -orderToDelete.qtyBought);
-        }
-
         orders.splice(indexToDelete, 1);
-
-        localStorage.setItem("bizTrackOrders", JSON.stringify(orders));
-
+        saveOrders();
+        syncProductSalesFromOrders();
         renderOrders(orders);
     }
 }
@@ -384,44 +450,38 @@ function updateOrder(orderID) {
     const indexToUpdate = orders.findIndex(order => order.orderID === orderID);
 
     if (indexToUpdate !== -1) {
-        const oldOrder = orders[indexToUpdate];
-
-        const itemPrice = parseFloat(document.getElementById("item-price").value);
-        const qtyBought = parseInt(document.getElementById("qty-bought").value);
+        const productID = document.getElementById("product-select").value;
+        const selectedProduct = products.find(product => product.prodID === productID);
+        const qtyBought = parseInt(document.getElementById("qty-bought").value, 10);
         const shipping = parseFloat(document.getElementById("shipping").value);
         const taxes = parseFloat(document.getElementById("taxes").value);
-        const productSelect = document.getElementById("product-select").value;
+
+        if (!selectedProduct) {
+            alert(t("chooseProduct"));
+            return;
+        }
 
         const updatedOrder = {
             orderID: document.getElementById("order-id").value,
             orderDate: document.getElementById("order-date").value,
-            itemName: document.getElementById("item-name").value,
-            itemPrice: itemPrice,
-            qtyBought: qtyBought,
-            shipping: shipping,
-            taxes: taxes,
-            orderTotal: ((itemPrice * qtyBought) + shipping + taxes),
-            orderStatus: document.getElementById("order-status").value,
-            productID: productSelect
-
+            productID,
+            itemName: selectedProduct.prodName,
+            itemPrice: Number(selectedProduct.prodPrice),
+            qtyBought,
+            shipping,
+            taxes,
+            orderTotal: (Number(selectedProduct.prodPrice) * qtyBought) + shipping + taxes,
+            orderStatus: document.getElementById("order-status").value
         };
 
         if (isDuplicateID(updatedOrder.orderID, orderID)) {
             alert(t("duplicateOrderId"));
             return;
         }
-        // Update product sales quantity
-        if (oldOrder.productID) {
-            // Subtract old quantity
-            updateProductSales(oldOrder.productID, -oldOrder.qtyBought);
-        }
-        // Add new quantity
-        updateProductSales(productSelect, qtyBought);
 
         orders[indexToUpdate] = updatedOrder;
-
-        localStorage.setItem("bizTrackOrders", JSON.stringify(orders));
-
+        saveOrders();
+        syncProductSalesFromOrders();
         renderOrders(orders);
 
         document.getElementById("order-form").reset();
@@ -585,3 +645,4 @@ window.exportToCSV = exportToCSV;
 window.formatOrderCsvValue = formatOrderCsvValue;
 window.translateOrderStatus = translateOrderStatus;
 window.populateProductSelect = populateProductSelect;
+window.syncProductSalesFromOrders = syncProductSalesFromOrders;

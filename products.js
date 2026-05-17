@@ -35,6 +35,9 @@ function openForm() {
 
 function closeForm() {
     document.getElementById("product-form").style.display = "none";
+    document.getElementById("product-id").disabled = false;
+    document.getElementById("submitBtn").textContent = t("add");
+    document.getElementById("submitBtn").dataset.mode = "add";
 }
 
 
@@ -81,6 +84,53 @@ function translateProductCategory(category) {
     };
 
     return productCategoryTranslations[category] ? t(productCategoryTranslations[category]) : category;
+}
+function saveProducts() {
+    localStorage.setItem("bizTrackProducts", JSON.stringify(products));
+}
+
+function getLinkedOrders() {
+    const storedOrders = localStorage.getItem("bizTrackOrders");
+
+    if (!storedOrders) {
+        return [];
+    }
+
+    try {
+        return JSON.parse(storedOrders);
+    } catch (error) {
+        console.warn("Invalid order data in localStorage.", error);
+        return [];
+    }
+}
+
+function productHasLinkedOrders(prodID) {
+    return getLinkedOrders().some(order => order.productID === prodID);
+}
+
+function syncProductSalesFromOrders() {
+    const orders = getLinkedOrders();
+
+    if (orders.length === 0) {
+        return;
+    }
+
+    const soldByProduct = new Map(products.map(product => [product.prodID, 0]));
+
+    orders.forEach(order => {
+        if (!order.productID) return;
+
+        const quantity = Number(order.qtyBought) || 0;
+        const currentQuantity = soldByProduct.get(order.productID) || 0;
+        soldByProduct.set(order.productID, currentQuantity + quantity);
+    });
+
+    products = products.map(product => ({
+        ...product,
+        prodSold: soldByProduct.get(product.prodID) || 0
+    }));
+
+    saveProducts();
 }
 
 function init() {
@@ -134,6 +184,7 @@ function init() {
         localStorage.setItem("bizTrackProducts", JSON.stringify(products));
     }
 
+    syncProductSalesFromOrders();
     renderProducts(products);
 
     if (typeof i18next !== "undefined") {
@@ -160,7 +211,7 @@ function newProduct(event) {
     const prodDesc = document.getElementById("product-desc").value;
     const prodCat = document.getElementById("product-cat").value;
     const prodPrice = parseFloat(document.getElementById("product-price").value);
-    const prodSold = parseInt(document.getElementById("product-sold").value);
+    const prodSold = 0;
 
     if (isDuplicateID(prodID, null)) {
         alert(t("duplicateProductId"));
@@ -178,8 +229,8 @@ function newProduct(event) {
 
     products.push(product);
 
+    saveProducts();
     renderProducts(products);
-    localStorage.setItem("bizTrackProducts", JSON.stringify(products));
 
     document.getElementById("product-form").reset();
 }
@@ -264,6 +315,7 @@ function editRow(prodID) {
     const productToEdit = products.find(product => product.prodID === prodID);
 
     document.getElementById("product-id").value = productToEdit.prodID;
+    document.getElementById("product-id").disabled = true;
     document.getElementById("product-name").value = productToEdit.prodName;
     document.getElementById("product-desc").value = productToEdit.prodDesc;
     document.getElementById("product-cat").value = productToEdit.prodCat;
@@ -277,13 +329,16 @@ function editRow(prodID) {
 }
 
 function deleteProduct(prodID) {
+    if (productHasLinkedOrders(prodID)) {
+        alert(t("productLinkedToOrders"));
+        return;
+    }
+
     const indexToDelete = products.findIndex(product => product.prodID === prodID);
 
     if (indexToDelete !== -1) {
         products.splice(indexToDelete, 1);
-
-        localStorage.setItem("bizTrackProducts", JSON.stringify(products));
-
+        saveProducts();
         renderProducts(products);
     }
 }
@@ -293,26 +348,21 @@ function updateProduct(prodID) {
 
     if (indexToUpdate !== -1) {
         const updatedProduct = {
-            prodID: document.getElementById("product-id").value,
+            prodID,
             prodName: document.getElementById("product-name").value,
             prodDesc: document.getElementById("product-desc").value,
             prodCat: document.getElementById("product-cat").value,
             prodPrice: parseFloat(document.getElementById("product-price").value),
-            prodSold: parseInt(document.getElementById("product-sold").value),
+            prodSold: products[indexToUpdate].prodSold
         };
 
-        if (isDuplicateID(updatedProduct.prodID, prodID)) {
-            alert(t("duplicateProductId"));
-            return;
-        }
-
         products[indexToUpdate] = updatedProduct;
-
-        localStorage.setItem("bizTrackProducts", JSON.stringify(products));
-
+        syncProductSalesFromOrders();
+        saveProducts();
         renderProducts(products);
 
         document.getElementById("product-form").reset();
+        document.getElementById("product-id").disabled = false;
         document.getElementById("submitBtn").textContent = t("add");
         document.getElementById("submitBtn").dataset.mode = "add";
     }
@@ -471,3 +521,5 @@ window.escapeCsvCell = escapeCsvCell;
 window.exportToCSV = exportToCSV;
 window.formatProductCsvValue = formatProductCsvValue;
 window.translateProductCategory = translateProductCategory;
+window.productHasLinkedOrders = productHasLinkedOrders;
+window.syncProductSalesFromOrders = syncProductSalesFromOrders;

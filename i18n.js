@@ -38,6 +38,7 @@ const resources = {
             delete: "Delete",
             duplicateProductId: "Product ID already exists. Please use a unique ID.",
             duplicateOrderId: "Order ID already exists. Please use a unique ID.",
+            productLinkedToOrders: "This product is linked to existing orders and cannot be deleted.",
             privacyPolicy: "Privacy Policy",
 
             addProduct: "Add Product",
@@ -214,6 +215,7 @@ const resources = {
             delete: "删除",
             duplicateProductId: "产品编号已存在，请使用唯一编号。",
             duplicateOrderId: "订单编号已存在，请使用唯一编号。",
+            productLinkedToOrders: "该产品已关联现有订单，无法删除。",
             privacyPolicy: "隐私政策",
 
             addProduct: "添加产品",
