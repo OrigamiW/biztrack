@@ -13,143 +13,153 @@
     <title>Expenses - BizTrack</title>
 </head>
 <body>
-    <a class="skip-link" href="#main-content">Skip to main content</a>
-    <div id="sidebar" class="sidebar">
-        <div class="logo">
+<a class="skip-link" href="#main-content" data-i18n="skipToMain">Skip to main content</a>
+<div id="sidebar" class="sidebar">
+    <div class="logo">
+        <a href="./index.html">
+            <i class="fas fa-b" aria-hidden="true"></i>
+            <span>BizTrack</span>
+        </a>
+        <button type="button" class="sidebar-close" aria-label="Close sidebar" onclick="closeSidebar()">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+    </div>
+    <ul class="menu">
+        <li>
             <a href="./index.html">
-                <i class="fas fa-b" aria-hidden="true"></i>
-                <span>BizTrack</span>
+                <i class="fa-solid fa-gauge-high"></i>
+                <span data-i18n="dashboard">Dashboard</span>
             </a>
-            <button type="button" class="sidebar-close" aria-label="Close sidebar" onclick="closeSidebar()">
-                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-            </button>
-        </div>
-        <ul class="menu">
-            <li>
-                <a href="./index.html">
-                    <i class="fa-solid fa-gauge-high"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li>
-                <a href="./products.html">
-                    <i class="fas fa-dolly"></i>
-                    <span>Products</span>
-                </a>
-            </li>
-            <li>
-                <a href="./orders.html">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Orders</span>
-                </a>
-            </li>
-            <li class="active">
-                <a href="./finances.html">
-                    <i class="fas fa-sack-dollar"></i>
-                    <span>Expenses</span>
-                </a>
-            </li>
-            <li>
-                <a href="./help.html">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Help</span>
-                </a>
-            </li>
-            <li class="logout">
-                <a href="./about.html">
-                    <i class="fa-solid fa-users-line"></i>
-                    <span>Meet the Developer</span>
-                </a>
-            </li>
-        </ul>
-    </div>
+        </li>
+        <li>
+            <a href="./products.html">
+                <i class="fas fa-dolly"></i>
+                <span data-i18n="products">Products</span>
+            </a>
+        </li>
+        <li>
+            <a href="./orders.html">
+                <i class="fas fa-shopping-cart"></i>
+                <span data-i18n="orders">Orders</span>
+            </a>
+        </li>
+        <li class="active">
+            <a href="./finances.html">
+                <i class="fas fa-sack-dollar"></i>
+                <span data-i18n="expenses">Expenses</span>
+            </a>
+        </li>
+        <li>
+            <a href="./help.html">
+                <i class="fas fa-question-circle"></i>
+                <span data-i18n="help">Help</span>
+            </a>
+        </li>
+        <li>
+            <a href="./privacy.html">
+                <i class="fas fa-shield-halved"></i>
+                <span data-i18n="privacyPolicy">Privacy Policy</span>
+            </a>
+        </li>
+        <li class="logout">
+            <a href="./about.html">
+                <i class="fa-solid fa-users-line"></i>
+                <span data-i18n="meetDeveloper">Meet the Developer</span>
+            </a>
+            <button id="language-toggle" type="button" onclick="toggleLanguage()">中文</button>
+        </li>
+    </ul>
+</div>
 
-    <div class="main-content" id="main-content" tabindex="-1">
-        <div class="header-wrapper">
-            <button type="button" class="menu-icon sidebar-toggle" aria-label="Open sidebar" aria-expanded="true" onclick="openSidebar()">
-                <i class="fa-solid fa-bars" aria-hidden="true"></i>
-            </button>
+<div class="main-content" id="main-content" tabindex="-1">
+    <div class="header-wrapper">
+        <button type="button" class="menu-icon sidebar-toggle" aria-label="Open sidebar" aria-expanded="true" onclick="openSidebar()">
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
+        </button>
 
-            <div class="header-title">
-                <!-- <span>Primary</span> -->
-                <h2>Expenses</h2>
-            </div>
-
-            <div class="user-info">
-                <div class="search-box">
-                    <i class="fas fa-search" aria-hidden="true"></i>
-                    <input type="search" id="searchInput" placeholder="Search" aria-label="Search expenses">
-                </div>
-                <!-- <i class="fas fa-user-alt fa-xl"></i> -->
-            </div>
+        <div class="header-title">
+            <!-- <span>Primary</span> -->
+            <h2 data-i18n="expenses">Expenses</h2>
         </div>
 
-        <div class="table-wrapper">
-            <div class="product-title">
-                <h3 class="main-title">Expenses</h3>
-                <div class="finance-button">
-                    <button class="add-button" onclick="openForm()">Add Expense</button>
-                    <button class="download-button" onclick="exportToCSV()">Export to CSV</button>
-                </div>
+        <div class="user-info">
+            <div class="search-box">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <input type="search" id="searchInput" placeholder="Search" aria-label="Search expenses" data-i18n-placeholder="search">
             </div>
-
-            <div class="form-popup">
-                <form class="form-container" id="transaction-form" onsubmit="addOrUpdate(event)">
-                    <div class="form-columns">
-                            <input type="hidden" id="tr-id">
-                            <label for="tr-date"><b>Date: </b></label>
-                            <input type="date" id="tr-date" required>
-
-                            <label for="tr-category"><b>Category: </b></label>
-                            <select name="tr-category" id="tr-category" required>
-                                <option value="" disabled selected hidden>Choose an expense category</option>
-                                <option value="Rent">Rent</option>
-                                <option value="Utilities">Utilities</option>
-                                <option value="Supplies">Supplies</option>
-                                <option value="Order Fulfillment">Order Fulfillment</option>
-                                <option value="Miscellaneous">Miscellaneous</option>
-                            </select>
-
-                            <label for="tr-amount"><b>Amount: </b></label>
-                            <input type="number" id="tr-amount" placeholder="$0.00" min="0.00" max="10000.00" step="0.01" required>
-
-                            <label for="tr-notes"><b>Notes: </b></label>
-                            <input type="text" id="tr-notes" placeholder="Power bill" required>
-                    </div>
-                    
-                    <div class="button-col">
-                        <button type="submit" class="btn" id="submitBtn">Add</button>
-                        <button type="button" class="btn cancel" onclick="closeForm()">Cancel</button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="table-container">
-                <table id="finance-table">
-                    <thead>
-                        <tr>
-                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('trID')" aria-label="Sort expenses by serial number">S/N</button></th>
-                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('trDate')" aria-label="Sort expenses by Date">Date</button></th>
-                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('trCategory')" aria-label="Sort expenses by Expense Category">Expense Category</button></th>
-                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('trAmount')" aria-label="Sort expenses by Amount">Amount</button></th>
-                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('trNotes')" aria-label="Sort expenses by Notes">Notes</button></th>
-                            <th scope="col">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="6">
-                                <div id="total-expenses"></div>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
+            <!-- <i class="fas fa-user-alt fa-xl"></i> -->
         </div>
     </div>
 
-    <script src="./finances.js"></script>
+    <div class="table-wrapper">
+        <div class="product-title">
+            <h3 class="main-title" data-i18n="expenses">Expenses</h3>
+            <div class="finance-button">
+                <button class="add-button" onclick="openForm()" data-i18n="addExpense">Add Expense</button>
+                <button class="download-button" onclick="exportToCSV()" data-i18n="exportToCsv">Export to CSV</button>
+            </div>
+        </div>
+
+        <div class="form-popup">
+            <form class="form-container" id="transaction-form" onsubmit="addOrUpdate(event)">
+                <div class="form-columns">
+                    <input type="hidden" id="tr-id">
+                    <label for="tr-date"><b data-i18n="dateLabel">Date: </b></label>
+                    <input type="date" id="tr-date" required>
+
+                    <label for="tr-category"><b data-i18n="categoryLabel">Category: </b></label>
+                    <select name="tr-category" id="tr-category" required>
+                        <option value="" disabled selected hidden data-i18n="chooseExpenseCategory">Choose an expense category</option>
+                        <option value="Rent" data-i18n="rent">Rent</option>
+                        <option value="Utilities" data-i18n="utilities">Utilities</option>
+                        <option value="Supplies" data-i18n="supplies">Supplies</option>
+                        <option value="Order Fulfillment" data-i18n="orderFulfillment">Order Fulfillment</option>
+                        <option value="Miscellaneous" data-i18n="miscellaneous">Miscellaneous</option>
+                    </select>
+
+                    <label for="tr-amount"><b data-i18n="amountLabel">Amount: </b></label>
+                    <input type="number" id="tr-amount" placeholder="$0.00" min="0.00" max="10000.00" step="0.01" required>
+
+                    <label for="tr-notes"><b data-i18n="notesLabel">Notes: </b></label>
+                    <input type="text" id="tr-notes" placeholder="Power bill" required data-i18n-placeholder="powerBill">
+                </div>
+
+                <div class="button-col">
+                    <button type="submit" class="btn" id="submitBtn" data-i18n="add">Add</button>
+                    <button type="button" class="btn cancel" onclick="closeForm()" data-i18n="cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <table id="finance-table">
+                <thead>
+                <tr>
+                    <th scope="col"><button type="button" class="sort-button" onclick="sortTable('trID')" aria-label="Sort expenses by serial number" data-i18n="serialNumber">S/N</button></th>
+                    <th scope="col"><button type="button" class="sort-button" onclick="sortTable('trDate')" aria-label="Sort expenses by Date" data-i18n="date">Date</button></th>
+                    <th scope="col"><button type="button" class="sort-button" onclick="sortTable('trCategory')" aria-label="Sort expenses by Expense Category" data-i18n="expenseCategory">Expense Category</button></th>
+                    <th scope="col"><button type="button" class="sort-button" onclick="sortTable('trAmount')" aria-label="Sort expenses by Amount" data-i18n="amount">Amount</button></th>
+                    <th scope="col"><button type="button" class="sort-button" onclick="sortTable('trNotes')" aria-label="Sort expenses by Notes" data-i18n="notes">Notes</button></th>
+                    <th scope="col" data-i18n="action">Action</th>
+                </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="6">
+                        <div id="total-expenses"></div>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/i18next@23.7.6/i18next.min.js"></script>
+<script src="i18n.js"></script>
+<script src="./finances.js"></script>
+<script src="privacy.js"></script>
 </body>
 </html>

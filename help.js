@@ -28,3 +28,6 @@ function closeSidebar() {
     toggleButton.focus();
   }
 }
+
+window.openSidebar = openSidebar;
+window.closeSidebar = closeSidebar;

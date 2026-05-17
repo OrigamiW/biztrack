@@ -1,31 +1,30 @@
-
 function openSidebar() {
-  const side = document.getElementById("sidebar");
-  const toggleButton = document.querySelector(".sidebar-toggle");
-  const closeButton = document.querySelector(".sidebar-close");
-  const shouldOpen = side.style.display !== "block";
+    const side = document.getElementById("sidebar");
+    const toggleButton = document.querySelector(".sidebar-toggle");
+    const closeButton = document.querySelector(".sidebar-close");
+    const shouldOpen = side.style.display !== "block";
 
-  side.style.display = shouldOpen ? "block" : "none";
+    side.style.display = shouldOpen ? "block" : "none";
 
-  if (toggleButton) {
-    toggleButton.setAttribute("aria-expanded", String(shouldOpen));
-  }
+    if (toggleButton) {
+        toggleButton.setAttribute("aria-expanded", String(shouldOpen));
+    }
 
-  if (shouldOpen && closeButton) {
-    closeButton.focus();
-  }
+    if (shouldOpen && closeButton) {
+        closeButton.focus();
+    }
 }
 
 function closeSidebar() {
-  const side = document.getElementById("sidebar");
-  const toggleButton = document.querySelector(".sidebar-toggle");
+    const side = document.getElementById("sidebar");
+    const toggleButton = document.querySelector(".sidebar-toggle");
 
-  side.style.display = "none";
+    side.style.display = "none";
 
-  if (toggleButton) {
-    toggleButton.setAttribute("aria-expanded", "false");
-    toggleButton.focus();
-  }
+    if (toggleButton) {
+        toggleButton.setAttribute("aria-expanded", "false");
+        toggleButton.focus();
+    }
 }
 
 
@@ -41,6 +40,26 @@ function closeForm() {
 
 let transactions = [];
 let serialNumberCounter;
+
+function t(key) {
+    if (typeof i18next !== "undefined" && i18next.isInitialized) {
+        return i18next.t(key);
+    }
+
+    return key;
+}
+
+function translateExpenseCategory(category) {
+    const categoryTranslations = {
+        "Rent": "rent",
+        "Utilities": "utilities",
+        "Supplies": "supplies",
+        "Order Fulfillment": "orderFulfillment",
+        "Miscellaneous": "miscellaneous"
+    };
+
+    return categoryTranslations[category] ? t(categoryTranslations[category]) : category;
+}
 
 window.onload = function () {
     const storedTransactions = localStorage.getItem("bizTrackTransactions");
@@ -86,18 +105,25 @@ window.onload = function () {
         ];
 
         serialNumberCounter = transactions.length + 1
-  
+
         localStorage.setItem("bizTrackTransactions", JSON.stringify(transactions));
     }
-  
+
     renderTransactions(transactions);
+
+    if (typeof i18next !== "undefined") {
+        i18next.on("languageChanged", function () {
+            renderTransactions(transactions);
+        });
+    }
 }
 
 function addOrUpdate(event) {
-    let type = document.getElementById("submitBtn").textContent;
-    if (type === 'Add') {
+    let type = document.getElementById("submitBtn").dataset.mode || "add";
+
+    if (type === "add") {
         newTransaction(event);
-    } else if (type === 'Update'){
+    } else if (type === "update"){
         const trId = document.getElementById("tr-id").value;
         updateTransaction(+trId); // convert to number
     }
@@ -113,123 +139,124 @@ function newTransaction(event) {
 
     serialNumberCounter = transactions.length + 1;
     let trID = serialNumberCounter;
-    
+
     const transaction = {
-      trID,
-      trDate,
-      trCategory,
-      trAmount,
-      trNotes,
+        trID,
+        trDate,
+        trCategory,
+        trAmount,
+        trNotes,
     };
-    
+
     transactions.push(transaction);
-  
+
     renderTransactions(transactions);
     localStorage.setItem("bizTrackTransactions", JSON.stringify(transactions));
 
     serialNumberCounter++;
     displayExpenses();
-  
+
     document.getElementById("transaction-form").reset();
 }
 
 function createTextCell(value, className = "") {
-  const td = document.createElement("td");
-  td.textContent = value == null ? "" : String(value);
+    const td = document.createElement("td");
+    td.textContent = value == null ? "" : String(value);
 
-  if (className) {
-    td.className = className;
-  }
+    if (className) {
+        td.className = className;
+    }
 
-  return td;
+    return td;
 }
 
 function createIconButton(title, iconClass, onClick) {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "icon-button";
-  button.title = title;
-  button.setAttribute("aria-label", title);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "icon-button";
+    button.title = title;
+    button.setAttribute("aria-label", title);
 
-  const icon = document.createElement("i");
-  icon.className = iconClass;
-  icon.setAttribute("aria-hidden", "true");
+    const icon = document.createElement("i");
+    icon.className = iconClass;
+    icon.setAttribute("aria-hidden", "true");
 
-  button.appendChild(icon);
-  button.addEventListener("click", onClick);
+    button.appendChild(icon);
+    button.addEventListener("click", onClick);
 
-  return button;
+    return button;
 }
 
 function renderTransactions(transactions) {
-  const transactionTableBody = document.getElementById("tableBody");
-  transactionTableBody.replaceChildren();
+    const transactionTableBody = document.getElementById("tableBody");
+    transactionTableBody.replaceChildren();
 
-  transactions.forEach(transaction => {
-    const transactionRow = document.createElement("tr");
-    transactionRow.className = "transaction-row";
+    transactions.forEach(transaction => {
+        const transactionRow = document.createElement("tr");
+        transactionRow.className = "transaction-row";
 
-    transactionRow.dataset.trID = transaction.trID;
-    transactionRow.dataset.trDate = transaction.trDate;
-    transactionRow.dataset.trCategory = transaction.trCategory;
-    transactionRow.dataset.trAmount = transaction.trAmount;
-    transactionRow.dataset.trNotes = transaction.trNotes;
+        transactionRow.dataset.trID = transaction.trID;
+        transactionRow.dataset.trDate = transaction.trDate;
+        transactionRow.dataset.trCategory = transaction.trCategory;
+        transactionRow.dataset.trAmount = transaction.trAmount;
+        transactionRow.dataset.trNotes = transaction.trNotes;
 
-    const formattedAmount = typeof transaction.trAmount === "number" ? `$${transaction.trAmount.toFixed(2)}` : "";
+        const formattedAmount = typeof transaction.trAmount === "number" ? `$${transaction.trAmount.toFixed(2)}` : "";
 
-    transactionRow.appendChild(createTextCell(transaction.trID));
-    transactionRow.appendChild(createTextCell(transaction.trDate));
-    transactionRow.appendChild(createTextCell(transaction.trCategory));
-    transactionRow.appendChild(createTextCell(formattedAmount, "tr-amount"));
-    transactionRow.appendChild(createTextCell(transaction.trNotes));
+        transactionRow.appendChild(createTextCell(transaction.trID));
+        transactionRow.appendChild(createTextCell(transaction.trDate));
+        transactionRow.appendChild(createTextCell(translateExpenseCategory(transaction.trCategory)));
+        transactionRow.appendChild(createTextCell(formattedAmount, "tr-amount"));
+        transactionRow.appendChild(createTextCell(transaction.trNotes));
 
-    const actionCell = document.createElement("td");
-    actionCell.className = "action";
+        const actionCell = document.createElement("td");
+        actionCell.className = "action";
 
-    actionCell.appendChild(
-      createIconButton(
-        `Edit transaction ${transaction.trID}`,
-        "edit-icon fa-solid fa-pen-to-square",
-        () => editRow(transaction.trID)
-      )
-    );
+        actionCell.appendChild(
+            createIconButton(
+                `${t("edit")} ${t("expenses")} ${transaction.trID}`,
+                "edit-icon fa-solid fa-pen-to-square",
+                () => editRow(transaction.trID)
+            )
+        );
 
-    actionCell.appendChild(
-      createIconButton(
-        `Delete transaction ${transaction.trID}`,
-        "delete-icon fas fa-trash-alt",
-        () => deleteTransaction(transaction.trID)
-      )
-    );
+        actionCell.appendChild(
+            createIconButton(
+                `${t("delete")} ${t("expenses")} ${transaction.trID}`,
+                "delete-icon fas fa-trash-alt",
+                () => deleteTransaction(transaction.trID)
+            )
+        );
 
-    transactionRow.appendChild(actionCell);
-    transactionTableBody.appendChild(transactionRow);
-  });
+        transactionRow.appendChild(actionCell);
+        transactionTableBody.appendChild(transactionRow);
+    });
 
-  displayExpenses();
+    displayExpenses();
 }
 
 function displayExpenses() {
-  const resultElement = document.getElementById("total-expenses");
-  const totalExpenses = transactions.reduce((total, transaction) => total + transaction.trAmount, 0);
+    const resultElement = document.getElementById("total-expenses");
+    const totalExpenses = transactions.reduce((total, transaction) => total + transaction.trAmount, 0);
 
-  resultElement.textContent = `Total Expenses: $${totalExpenses.toFixed(2)}`;
+    resultElement.textContent = `${t("totalExpenses")}: $${totalExpenses.toFixed(2)}`;
 }
 
 function editRow(trID) {
     const trToEdit = transactions.find(transaction => transaction.trID == trID);
-    
-    document.getElementById("tr-id").value = trToEdit.trID;      
+
+    document.getElementById("tr-id").value = trToEdit.trID;
     document.getElementById("tr-date").value = trToEdit.trDate;
     document.getElementById("tr-category").value = trToEdit.trCategory;
     document.getElementById("tr-amount").value = trToEdit.trAmount;
     document.getElementById("tr-notes").value = trToEdit.trNotes;
-  
-    document.getElementById("submitBtn").textContent = "Update";
+
+    document.getElementById("submitBtn").textContent = t("update");
+    document.getElementById("submitBtn").dataset.mode = "update";
 
     document.getElementById("transaction-form").style.display = "block";
-  }
-  
+}
+
 function deleteTransaction(trID) {
     const indexToDelete = transactions.findIndex(transaction => transaction.trID == trID);
 
@@ -242,7 +269,7 @@ function deleteTransaction(trID) {
     }
 }
 
-  function updateTransaction(trID) {
+function updateTransaction(trID) {
     const indexToUpdate = transactions.findIndex(transaction => transaction.trID === trID);
 
     if (indexToUpdate !== -1) {
@@ -261,7 +288,8 @@ function deleteTransaction(trID) {
         renderTransactions(transactions);
 
         document.getElementById("transaction-form").reset();
-        document.getElementById("submitBtn").textContent = "Add";
+        document.getElementById("submitBtn").textContent = t("add");
+        document.getElementById("submitBtn").dataset.mode = "add";
     }
 }
 
@@ -386,3 +414,26 @@ function exportToCSV() {
 
     window.URL.revokeObjectURL(url);
 }
+
+document.addEventListener("i18nReady", function () {
+    renderTransactions(transactions);
+});
+
+window.openSidebar = openSidebar;
+window.closeSidebar = closeSidebar;
+window.openForm = openForm;
+window.closeForm = closeForm;
+window.addOrUpdate = addOrUpdate;
+window.newTransaction = newTransaction;
+window.editRow = editRow;
+window.updateTransaction = updateTransaction;
+window.deleteTransaction = deleteTransaction;
+window.displayExpenses = displayExpenses;
+window.renderTransactions = renderTransactions;
+window.sortTable = sortTable;
+window.performSearch = performSearch;
+window.generateCSV = generateCSV;
+window.escapeCsvCell = escapeCsvCell;
+window.exportToCSV = exportToCSV;
+window.formatFinanceCsvValue = formatFinanceCsvValue;
+window.translateExpenseCategory = translateExpenseCategory;

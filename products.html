@@ -13,176 +13,186 @@
     <title>Products - BizTrack</title>
 </head>
 <body>
-    <a class="skip-link" href="#main-content">Skip to main content</a>
-    <div id="sidebar" class="sidebar">
-        <div class="logo">
+<a class="skip-link" href="#main-content" data-i18n="skipToMain">Skip to main content</a>
+<div id="sidebar" class="sidebar">
+    <div class="logo">
+        <a href="./index.html">
+            <i class="fas fa-b" aria-hidden="true"></i>
+            <span>BizTrack</span>
+        </a>
+        <button type="button" class="sidebar-close" aria-label="Close sidebar" onclick="closeSidebar()">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+    </div>
+    <ul class="menu">
+        <li>
             <a href="./index.html">
-                <i class="fas fa-b" aria-hidden="true"></i>
-                <span>BizTrack</span>
+                <i class="fa-solid fa-gauge-high"></i>
+                <span data-i18n="dashboard">Dashboard</span>
             </a>
-            <button type="button" class="sidebar-close" aria-label="Close sidebar" onclick="closeSidebar()">
-                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-            </button>
-        </div>
-        <ul class="menu">
-            <li>
-                <a href="./index.html">
-                    <i class="fa-solid fa-gauge-high"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="active">
-                <a href="./products.html">
-                    <i class="fas fa-dolly"></i>
-                    <span>Products</span>
-                </a>
-            </li>
-            <li>
-                <a href="./orders.html">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Orders</span>
-                </a>
-            </li>
-            <li>
-                <a href="./finances.html">
-                    <i class="fas fa-sack-dollar"></i>
-                    <span>Expenses</span>
-                </a>
-            </li>
-            <li>
-                <a href="./help.html">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Help</span>
-                </a>
-            </li>
-            <li class="logout">
-                <a href="./about.html">
-                    <i class="fa-solid fa-users-line"></i>
-                    <span>Meet the Developer</span>
-                </a>
-            </li>
-        </ul>
-    </div>
+        </li>
+        <li class="active">
+            <a href="./products.html">
+                <i class="fas fa-dolly"></i>
+                <span data-i18n="products">Products</span>
+            </a>
+        </li>
+        <li>
+            <a href="./orders.html">
+                <i class="fas fa-shopping-cart"></i>
+                <span data-i18n="orders">Orders</span>
+            </a>
+        </li>
+        <li>
+            <a href="./finances.html">
+                <i class="fas fa-sack-dollar"></i>
+                <span data-i18n="expenses">Expenses</span>
+            </a>
+        </li>
+        <li>
+            <a href="./help.html">
+                <i class="fas fa-question-circle"></i>
+                <span data-i18n="help">Help</span>
+            </a>
+        </li>
+        <li>
+            <a href="./privacy.html">
+                <i class="fas fa-shield-halved"></i>
+                <span data-i18n="privacyPolicy">Privacy Policy</span>
+            </a>
+        </li>
+        <li class="logout">
+            <a href="./about.html">
+                <i class="fa-solid fa-users-line"></i>
+                <span data-i18n="meetDeveloper">Meet the Developer</span>
+            </a>
+            <button id="language-toggle" type="button" onclick="toggleLanguage()">中文</button>
+        </li>
+    </ul>
+</div>
 
-    <div class="main-content" id="main-content" tabindex="-1">
-        <div class="header-wrapper">
-            <button type="button" class="menu-icon sidebar-toggle" aria-label="Open sidebar" aria-expanded="true" onclick="openSidebar()">
-                <i class="fa-solid fa-bars" aria-hidden="true"></i>
-            </button>
+<div class="main-content" id="main-content" tabindex="-1">
+    <div class="header-wrapper">
+        <button type="button" class="menu-icon sidebar-toggle" aria-label="Open sidebar" aria-expanded="true" onclick="openSidebar()">
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
+        </button>
 
-            <div class="header-title">
-                <!-- <span>Primary</span> -->
-                <h2>Products</h2>
-            </div>
-
-            <div class="user-info">
-                <div class="search-box">
-                    <i class="fas fa-search" aria-hidden="true"></i>
-                    <input type="search" id="searchInput" placeholder="Search" aria-label="Search products">
-                </div>
-                <!-- <i class="fas fa-user-alt fa-xl"></i> -->
-            </div>
+        <div class="header-title">
+            <!-- <span>Primary</span> -->
+            <h2 data-i18n="products">Products</h2>
         </div>
 
-        <div class="table-wrapper">
-            <div class="product-title">
-                <h3 class="main-title">Products</h3>
-                <div class="product-button">
-                    <button class="add-button" onclick="openForm()">Add Product</button>
-                    <button class="download-button" onclick="exportToCSV()">Download CSV</button>
-                </div>
+        <div class="user-info">
+            <div class="search-box">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <input type="search" id="searchInput" placeholder="Search" aria-label="Search products" data-i18n-placeholder="search">
             </div>
-            <div class="form-popup">
-                <form class="form-container" id="product-form" onsubmit="addOrUpdate(event)">
-                    <div class="form-columns">
-                        <div class="first-col">
-                            <label for="product-id"><b>Product ID: </b></label>
-                            <input type="text" id="product-id" placeholder="PD001" required>
-                        
-                            <label for="product-name"><b>Product Name</b></label>
-                            <select name="product-name" id="product-name" required>
-                                <option value="" disabled selected hidden>Choose a product</option>
-                                <optgroup label="Hats">
-                                    <option value="Baseball caps">Baseball caps</option>
-                                    <option value="Snapbacks">Snapbacks</option>
-                                    <option value="Beanies">Beanies</option>
-                                    <option value="Bucket hats">Bucket hats</option>
-                                </optgroup>
-                                <optgroup label="Drinkware">
-                                    <option value="Mugs">Mugs</option>
-                                    <option value="Water bottles">Water bottles</option>
-                                    <option value="Tumblers">Tumblers</option>
-                                </optgroup>   
-                                <optgroup label="Clothing">
-                                    <option value="T-shirts">T-shirts</option>
-                                    <option value="Sweatshirts">Sweatshirts</option>
-                                    <option value="Hoodies">Hoodies</option>
-                                </optgroup>   
-                                <optgroup label="Accessories">
-                                    <option value="Pillow cases">Pillow cases</option>
-                                    <option value="Tote bags">Tote bags</option>
-                                    <option value="Stickers">Stickers</option>
-                                </optgroup>   
-                                <optgroup label="Home decor">
-                                    <option value="Posters">Posters</option>
-                                    <option value="Framed posters">Framed posters</option>
-                                    <option value="Canvas prints">Canvas prints</option>
-                                </optgroup>
-                            </select>
-    
-                            <label for="product-desc"><b>Product Description:</b></label>
-                            <input type="text" id="product-desc" placeholder="Travel Mug" required>
-                        </div>
-                        <div class="second-col">
-                            <label for="product-cat"><b>Product Category:</b></label>
-                            <select name="product-cat" id="product-cat" required>
-                                <option value="" disabled selected>Choose a category</option>
-                                <option value="Clothing">Clothing</option>
-                                <option value="Drinkware">Drinkware</option>
-                                <option value="Accessories">Accessories</option>
-                                <option value="Hats">Hats</option>
-                                <option value="Home decor">Home decor</option>
-                            </select>
-    
-                            <label for="product-price"><b>Product Price:</b></label>
-                            <input type="number" id="product-price" placeholder="$0.00" min="0.00" max="10000.00" step="0.01" required>
-    
-                            <label for="product-sold"><b>Number of Units Sold:</b></label>
-                            <input type="number" id="product-sold" placeholder="10" required>
-                        </div>
-                    </div>
-                    
-                    <div class="button-col">
-                        <button type="submit" class="btn" id="submitBtn">Add</button>
-                        <button type="button" class="btn cancel" onclick="closeForm()">Cancel</button>
-                    </div>
-                </form>
-            </div>
-            <div class="table-container">
-                <table id="product-table">
-                    <thead>
-                        <tr>
-                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('prodID')" aria-label="Sort products by Product ID">Product ID</button></th>
-                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('prodName')" aria-label="Sort products by Product Name">Product Name</button></th>
-                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('prodDesc')" aria-label="Sort products by Description">Description</button></th>
-                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('prodCat')" aria-label="Sort products by Category">Category</button></th>
-                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('prodPrice')" aria-label="Sort products by Price">Price</button></th>
-                            <th scope="col"><button type="button" class="sort-button" onclick="sortTable('prodSold')" aria-label="Sort products by Units Sold">Units Sold</button></th>
-                            <th scope="col">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                    </tbody>
-                    <!-- <tfoot>
-                        <tr>
-                            <td colspan="11"><a href="#">View more orders</a></td>
-                        </tr>
-                    </tfoot> -->
-                </table>
-            </div>
+            <!-- <i class="fas fa-user-alt fa-xl"></i> -->
         </div>
     </div>
 
-    <script src="./products.js"></script>
+    <div class="table-wrapper">
+        <div class="product-title">
+            <h3 class="main-title" data-i18n="products">Products</h3>
+            <div class="product-button">
+                <button class="add-button" onclick="openForm()" data-i18n="addProduct">Add Product</button>
+                <button class="download-button" onclick="exportToCSV()" data-i18n="downloadCsv">Download CSV</button>
+            </div>
+        </div>
+        <div class="form-popup">
+            <form class="form-container" id="product-form" onsubmit="addOrUpdate(event)">
+                <div class="form-columns">
+                    <div class="first-col">
+                        <label for="product-id"><b data-i18n="productIdLabel">Product ID: </b></label>
+                        <input type="text" id="product-id" placeholder="PD001" required>
+
+                        <label for="product-name"><b data-i18n="productNameLabel">Product Name</b></label>
+                        <select name="product-name" id="product-name" required>
+                            <option value="" disabled selected hidden data-i18n="chooseProduct">Choose a product</option>
+                            <optgroup label="Hats" data-i18n-label="hats">
+                                <option value="Baseball caps" data-i18n="baseballCaps">Baseball caps</option>
+                                <option value="Snapbacks" data-i18n="snapbacks">Snapbacks</option>
+                                <option value="Beanies" data-i18n="beanies">Beanies</option>
+                                <option value="Bucket hats" data-i18n="bucketHats">Bucket hats</option>
+                            </optgroup>
+                            <optgroup label="Drinkware" data-i18n-label="drinkware">
+                                <option value="Mugs" data-i18n="mugs">Mugs</option>
+                                <option value="Water bottles" data-i18n="waterBottles">Water bottles</option>
+                                <option value="Tumblers" data-i18n="tumblers">Tumblers</option>
+                            </optgroup>
+                            <optgroup label="Clothing" data-i18n-label="clothing">
+                                <option value="T-shirts" data-i18n="tShirts">T-shirts</option>
+                                <option value="Sweatshirts" data-i18n="sweatshirts">Sweatshirts</option>
+                                <option value="Hoodies" data-i18n="hoodies">Hoodies</option>
+                            </optgroup>
+                            <optgroup label="Accessories" data-i18n-label="accessories">
+                                <option value="Pillow cases" data-i18n="pillowCases">Pillow cases</option>
+                                <option value="Tote bags" data-i18n="toteBags">Tote bags</option>
+                                <option value="Stickers" data-i18n="stickers">Stickers</option>
+                            </optgroup>
+                            <optgroup label="Home decor" data-i18n-label="homeDecor">
+                                <option value="Posters" data-i18n="posters">Posters</option>
+                                <option value="Framed posters" data-i18n="framedPosters">Framed posters</option>
+                                <option value="Canvas prints" data-i18n="canvasPrints">Canvas prints</option>
+                            </optgroup>
+                        </select>
+
+                        <label for="product-desc"><b data-i18n="productDescriptionLabel">Product Description:</b></label>
+                        <input type="text" id="product-desc" placeholder="Travel Mug" required data-i18n-placeholder="travelMug">
+                    </div>
+                    <div class="second-col">
+                        <label for="product-cat"><b data-i18n="productCategoryLabel">Product Category:</b></label>
+                        <select name="product-cat" id="product-cat" required>
+                            <option value="" disabled selected data-i18n="chooseCategory">Choose a category</option>
+                            <option value="Clothing" data-i18n="clothing">Clothing</option>
+                            <option value="Drinkware" data-i18n="drinkware">Drinkware</option>
+                            <option value="Accessories" data-i18n="accessories">Accessories</option>
+                            <option value="Hats" data-i18n="hats">Hats</option>
+                            <option value="Home decor" data-i18n="homeDecor">Home decor</option>
+                        </select>
+
+                        <label for="product-price"><b data-i18n="productPriceLabel">Product Price:</b></label>
+                        <input type="number" id="product-price" placeholder="$0.00" min="0.00" max="10000.00" step="0.01" required>
+
+                        <label for="product-sold"><b data-i18n="numberUnitsSoldLabel">Number of Units Sold:</b></label>
+                        <input type="number" id="product-sold" placeholder="10" required>
+                    </div>
+                </div>
+
+                <div class="button-col">
+                    <button type="submit" class="btn" id="submitBtn" data-i18n="add">Add</button>
+                    <button type="button" class="btn cancel" onclick="closeForm()" data-i18n="cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+        <div class="table-container">
+            <table id="product-table">
+                <thead>
+                <tr>
+                    <th scope="col"><button type="button" class="sort-button" onclick="sortTable('prodID')" aria-label="Sort products by Product ID" data-i18n="productId">Product ID</button></th>
+                    <th scope="col"><button type="button" class="sort-button" onclick="sortTable('prodName')" aria-label="Sort products by Product Name" data-i18n="productName">Product Name</button></th>
+                    <th scope="col"><button type="button" class="sort-button" onclick="sortTable('prodDesc')" aria-label="Sort products by Description" data-i18n="description">Description</button></th>
+                    <th scope="col"><button type="button" class="sort-button" onclick="sortTable('prodCat')" aria-label="Sort products by Category" data-i18n="category">Category</button></th>
+                    <th scope="col"><button type="button" class="sort-button" onclick="sortTable('prodPrice')" aria-label="Sort products by Price" data-i18n="price">Price</button></th>
+                    <th scope="col"><button type="button" class="sort-button" onclick="sortTable('prodSold')" aria-label="Sort products by Units Sold" data-i18n="unitsSold">Units Sold</button></th>
+                    <th scope="col" data-i18n="action">Action</th>
+                </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+                <!-- <tfoot>
+                    <tr>
+                        <td colspan="11"><a href="#">View more orders</a></td>
+                    </tr>
+                </tfoot> -->
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/i18next@23.7.6/i18next.min.js"></script>
+<script src="i18n.js"></script>
+<script src="./products.js"></script>
+<script src="privacy.js"></script>
 </body>
 </html>
