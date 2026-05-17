@@ -153,8 +153,8 @@ describe("orders.js", () => {
         window.onload();
 
         expect(document.querySelectorAll(".order-row").length).toBe(1);
-        expect(document.body.textContent).toContain("Test Item");
-        expect(document.getElementById("total-revenue").textContent).toContain("$24.00");
+        expect(document.body.textContent).toContain("Baseball caps");
+        expect(document.getElementById("total-revenue").textContent).toContain("$54.00");
     });
 
     it("populateProductSelect should add product options", () => {
@@ -200,7 +200,28 @@ describe("orders.js", () => {
         expect(storedOrders.length).toBe(6);
         expect(storedOrders[5].orderID).toBe("9999");
         expect(storedOrders[5].orderTotal).toBe(54);
-        expect(storedProducts[0].prodSold).toBe(22);
+        expect(storedProducts[0].prodSold).toBe(4);
+    });
+
+    it("newOrder should reject an empty product selection", () => {
+        window.onload();
+
+        document.getElementById("order-id").value = "9010";
+        document.getElementById("order-date").value = "2024-10-01";
+        document.getElementById("product-select").value = "";
+        document.getElementById("item-name").value = "";
+        document.getElementById("item-price").value = "";
+        document.getElementById("qty-bought").value = "2";
+        document.getElementById("shipping").value = "3";
+        document.getElementById("taxes").value = "1";
+        document.getElementById("order-status").value = "Pending";
+
+        window.newOrder({ preventDefault: vi.fn() });
+
+        const storedOrders = JSON.parse(localStorage.getItem("bizTrackOrders"));
+
+        expect(storedOrders.some(order => String(order.orderID) === "9010")).toBe(false);
+        expect(window.alert).toHaveBeenCalledWith("chooseProduct");
     });
 
     it("newOrder should not add duplicate order ID", () => {
@@ -275,8 +296,8 @@ describe("orders.js", () => {
         expect(storedOrders[0].orderStatus).toBe("Processing");
         expect(document.getElementById("submitBtn").dataset.mode).toBe("add");
 
-        expect(storedProducts[0].prodSold).toBe(18);
-        expect(storedProducts[1].prodSold).toBe(13);
+        expect(storedProducts[0].prodSold).toBe(0);
+        expect(storedProducts[1].prodSold).toBe(3);
     });
 
     it("updateOrder should not allow duplicate order ID", () => {
@@ -289,6 +310,35 @@ describe("orders.js", () => {
         window.updateOrder("1001");
 
         expect(window.alert).toHaveBeenCalledWith("duplicateOrderId");
+    });
+
+    it("updateOrder should reject an empty product selection", () => {
+        localStorage.setItem("bizTrackOrders", JSON.stringify([
+            {
+                orderID: "1001",
+                orderDate: "2024-01-05",
+                productID: "PD001",
+                itemName: "Baseball caps",
+                itemPrice: 25,
+                qtyBought: 2,
+                shipping: 2.5,
+                taxes: 9,
+                orderTotal: 61.5,
+                orderStatus: "Pending"
+            }
+        ]));
+
+        window.onload();
+        window.editRow("1001");
+
+        document.getElementById("product-select").value = "";
+
+        window.updateOrder("1001");
+
+        const storedOrders = JSON.parse(localStorage.getItem("bizTrackOrders"));
+
+        expect(storedOrders[0].productID).toBe("PD001");
+        expect(window.alert).toHaveBeenCalledWith("chooseProduct");
     });
 
     it("deleteOrder should remove an order and update product sales", () => {
@@ -315,14 +365,18 @@ describe("orders.js", () => {
         const storedProducts = JSON.parse(localStorage.getItem("bizTrackProducts"));
 
         expect(storedOrders.length).toBe(0);
-        expect(storedProducts[0].prodSold).toBe(18);
+        expect(storedProducts[0].prodSold).toBe(0);
     });
 
     it("displayRevenue should calculate total revenue", () => {
+        localStorage.setItem("bizTrackOrders", JSON.stringify([]));
+        window.onload();
+
         document.getElementById("order-id").value = "O001";
         document.getElementById("order-date").value = "2024-01-01";
-        document.getElementById("item-name").value = "Blue Hat";
-        document.getElementById("item-price").value = "50";
+        document.getElementById("product-select").value = "PD001";
+        document.getElementById("item-name").value = "Baseball caps";
+        document.getElementById("item-price").value = "25";
         document.getElementById("qty-bought").value = "2";
         document.getElementById("shipping").value = "0";
         document.getElementById("taxes").value = "0";
@@ -331,8 +385,9 @@ describe("orders.js", () => {
 
         document.getElementById("order-id").value = "O002";
         document.getElementById("order-date").value = "2024-01-02";
-        document.getElementById("item-name").value = "Coffee Mug";
-        document.getElementById("item-price").value = "50.5";
+        document.getElementById("product-select").value = "PD002";
+        document.getElementById("item-name").value = "Water bottles";
+        document.getElementById("item-price").value = "17";
         document.getElementById("qty-bought").value = "1";
         document.getElementById("shipping").value = "0";
         document.getElementById("taxes").value = "0";
@@ -341,7 +396,7 @@ describe("orders.js", () => {
 
         window.displayRevenue();
 
-        expect(document.getElementById("total-revenue").innerHTML).toContain("$150.50");
+        expect(document.getElementById("total-revenue").innerHTML).toContain("$67.00");
     });
 
     it("isDuplicateID should detect duplicate order IDs", () => {
@@ -419,10 +474,14 @@ describe("orders.js", () => {
     });
 
     it("performSearch should hide rows that do not match search input", () => {
+        localStorage.setItem("bizTrackOrders", JSON.stringify([]));
+        window.onload();
+
         document.getElementById("order-id").value = "O001";
         document.getElementById("order-date").value = "2024-01-01";
-        document.getElementById("item-name").value = "Blue Hat";
-        document.getElementById("item-price").value = "10";
+        document.getElementById("product-select").value = "PD001";
+        document.getElementById("item-name").value = "Baseball caps";
+        document.getElementById("item-price").value = "25";
         document.getElementById("qty-bought").value = "2";
         document.getElementById("shipping").value = "0";
         document.getElementById("taxes").value = "0";
@@ -431,8 +490,9 @@ describe("orders.js", () => {
 
         document.getElementById("order-id").value = "O002";
         document.getElementById("order-date").value = "2024-01-02";
-        document.getElementById("item-name").value = "Coffee Mug";
-        document.getElementById("item-price").value = "15";
+        document.getElementById("product-select").value = "PD002";
+        document.getElementById("item-name").value = "Water bottles";
+        document.getElementById("item-price").value = "17";
         document.getElementById("qty-bought").value = "1";
         document.getElementById("shipping").value = "0";
         document.getElementById("taxes").value = "0";
@@ -443,15 +503,15 @@ describe("orders.js", () => {
 
         Object.defineProperty(rows[0], "innerText", {
             configurable: true,
-            value: "O001 2024-01-01 Blue Hat 10 2 0 0 20 Pending"
+            value: "O001 2024-01-01 Baseball caps 25 2 0 0 50 Pending"
         });
 
         Object.defineProperty(rows[1], "innerText", {
             configurable: true,
-            value: "O002 2024-01-02 Coffee Mug 15 1 0 0 15 Shipped"
+            value: "O002 2024-01-02 Water bottles 17 1 0 0 17 Shipped"
         });
 
-        document.getElementById("searchInput").value = "hat";
+        document.getElementById("searchInput").value = "caps";
 
         window.performSearch();
 
@@ -649,13 +709,17 @@ describe("orders.js", () => {
         expect(row.textContent).toContain("Unknown");
     });
     it("addOrUpdate should add order by default when dataset mode is missing", () => {
+        localStorage.setItem("bizTrackOrders", JSON.stringify([]));
+        window.onload();
+
         const submitBtn = document.getElementById("submitBtn");
         delete submitBtn.dataset.mode;
 
         document.getElementById("order-id").value = "9001";
         document.getElementById("order-date").value = "2024-01-01";
-        document.getElementById("item-name").value = "Test Item";
-        document.getElementById("item-price").value = "10";
+        document.getElementById("product-select").value = "PD001";
+        document.getElementById("item-name").value = "Baseball caps";
+        document.getElementById("item-price").value = "25";
         document.getElementById("qty-bought").value = "2";
         document.getElementById("shipping").value = "3";
         document.getElementById("taxes").value = "4";
