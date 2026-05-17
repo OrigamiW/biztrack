@@ -134,27 +134,29 @@ describe("orders.js", () => {
         expect(document.getElementById("total-revenue").textContent).toContain("totalRevenue");
     });
 
-    it("window.onload should load orders from localStorage when available", () => {
+    it("window.onload should prefer item-name matching before legacy order ID mapping", () => {
         localStorage.setItem("bizTrackOrders", JSON.stringify([
             {
-                orderID: "2001",
+                orderID: "1001",
                 orderDate: "2024-05-01",
-                itemName: "Test Item",
-                itemPrice: 10,
+                itemName: "Water bottles",
+                itemPrice: 999,
                 qtyBought: 2,
-                shipping: 3,
-                taxes: 1,
-                orderTotal: 24,
-                orderStatus: "Pending",
-                productID: "PD001"
+                shipping: 0,
+                taxes: 0,
+                orderTotal: 1998,
+                orderStatus: "Pending"
             }
         ]));
 
         window.onload();
 
-        expect(document.querySelectorAll(".order-row").length).toBe(1);
-        expect(document.body.textContent).toContain("Baseball caps");
-        expect(document.getElementById("total-revenue").textContent).toContain("$54.00");
+        const storedOrders = JSON.parse(localStorage.getItem("bizTrackOrders"));
+
+        expect(storedOrders[0].productID).toBe("PD002");
+        expect(storedOrders[0].itemName).toBe("Water bottles");
+        expect(storedOrders[0].itemPrice).toBe(17);
+        expect(storedOrders[0].orderTotal).toBe(34);
     });
 
     it("populateProductSelect should add product options", () => {
